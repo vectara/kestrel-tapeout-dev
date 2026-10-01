@@ -4,17 +4,17 @@
 |---|---|
 | Doc ID | KST-IPBOM-050 |
 | Title | IP Bill of Materials |
-| Revision | B (supersedes A) |
-| Date | 2026-08-31 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-21 |
 | Owner | Beatriz Solano (IP Manager) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
 
 ## 1. Scope
 
-This document lists every IP block integrated in KESTREL (ALX-5100) for tape-out package B, with version, source, qualification status, the carry-forward errata cross-check (CHK-IP-03) and the integration hash check (CHK-IP-02). Versions are as integrated in netlist kst_top_nl_2026.08.31 and the matching implementation database.
+This document lists every IP block integrated in KESTREL (ALX-5100) for tape-out package C, with version, source, qualification status, the carry-forward errata cross-check (CHK-IP-03) and the integration hash check (CHK-IP-02). Versions are as integrated in netlist kst_top_nl_2026.09.19 and the matching implementation database.
 
 Reference documents: KST-ARCH-001, KST-PKG-002, KST-VPLAN-010, ALD-QA-CHK-007 rev 7.2, ALX4100-ERR rev 3.1, vendor release notes for each third-party IP (for MC-LP5X / PHY-LP5X: MIPV-RN-LP5X-027).
 
@@ -30,7 +30,7 @@ Reference documents: KST-ARCH-001, KST-PKG-002, KST-VPLAN-010, ALD-QA-CHK-007 re
 | 5 | NoC generator | NOCGEN | v4.1 | licensed | Production release (generator); generated RTL verified per KST-VPLAN-010 | MATCH sha256:5e76f735 | 4x4 mesh, 512-bit links |
 | 6 | PCIe Gen5 controller (PCIE0 x16, PCIE1 x8) | PCIE5-CTL | v5.2.1 | third-party | Production-qualified; Gen5 compliance-tested by vendor | MATCH sha256:1d60aa68 | PCIE0 x16 active; PCIE1 x8 fused off (FUSE_PCIE1_DIS=1) |
 | 7 | PCIe Gen5 PHY | PCIE5-PHY-N5 | v1.4 | third-party hard macro | Production-qualified; silicon-proven on vendor N5-class test chip | MATCH sha256:76c02daa | 2 instances (PCIE0, PCIE1) |
-| 8 | PCIe L1 PM substates sequencer | l1ss_ctl | v3.0 | in-house | In-house; verification per KST-VPLAN-010 | MATCH (repo release tag) | in-house (redesigned after ALX4100-E03) |
+| 8 | PCIe L1 PM substates sequencer | l1ss_ctl | v3.0.1 | in-house | In-house; verification per KST-VPLAN-010 | MATCH (repo release tag l1ss_ctl_v3.0.1) | in-house (redesigned after ALX4100-E03); v3.0 + ECO-C-003 (PCIE-1187) |
 | 9 | LPDDR5X memory controller | MC-LP5X | v2.7.0 | third-party (vendor code MIPV) | Production-qualified (silicon-proven on vendor N5-class test chip) | MATCH sha256:5b0f3422 | ECO-B-004; includes LPX-1182; matched with PHY-LP5X-N5 v2.7.0 |
 | 10 | LPDDR5X PHY | PHY-LP5X-N5 | v2.7.0 | third-party hard macro (vendor code MIPV) | Production-qualified (silicon-proven on vendor N5-class test chip) | MATCH sha256:ce955a2e | ECO-B-004; includes LPX-1182; GDS/LEF/LIB re-delivered; 4 instances (u_ddr_ss/u_phy0..u_phy3) |
 | 11 | Fractional PLL | PLL-N5-FRAC | v3.1 | third-party | Production-qualified; silicon-proven | MATCH sha256:02caf4a6 | 4 instances (PLL_CORE, PLL_NPU, PLL_CPU, PLL_DDR) |
@@ -80,7 +80,7 @@ Source: ALX4100-ERR rev 3.1 (2025-11-12). All 14 ALX-4100 errata are listed. Car
 |---|---|---|---|---|---|---|
 | ALX4100-E01 | resolved - NPU-DMA v1.4 (fixed in v1.3); covergroup cg_npu_dma_ring_wrap (Escape-history) | Yes | NPU-DMA v1.4 | V. Halloran | 2026-08-06 | - |
 | ALX4100-E02 | No carry-forward (won't fix; SW workaround) | No | - | L. Brandt | 2026-08-06 | - |
-| ALX4100-E03 | in-house l1ss_ctl v3.0 redesign; verify per CHK-VER-07 | Yes | l1ss_ctl v3.0 | L. Brandt | 2026-08-06 | - |
+| ALX4100-E03 | resolved - in-house l1ss_ctl v3.0.1 (v3.0 redesign + ECO-C-003 fix for PCIE-1187, closed 2026-09-17); a_l1ss_p12_exit_refclk_valid fully proven; cg_pcie0_l12_entry_exit closure per TB-C-001 (Escape-history, no waiver) | Yes | l1ss_ctl v3.0.1 | L. Brandt | 2026-09-21 | - |
 | ALX4100-E04 | resolved - MC-LP5X v2.7.0 (fixed in v2.6.0, LPX-1107) | Yes | MC-LP5X v2.7.0 | A. Deshmukh | 2026-08-28 | MIPV-RN-LP5X-027 |
 | ALX4100-E05 | resolved - I2C-CTL v1.5 (fixed in v1.4, same release line); covergroup cg_i2c_clk_stretch (Escape-history) | Yes | I2C-CTL v1.5 | K. Mensah | 2026-08-06 | I2C-CTL RN rev 9: v1.5 fixed-issue list includes I2CC-0049 (25 ms clock-stretch timeout), carried from v1.4 |
 | ALX4100-E06 | No carry-forward (documentation update) | No | - | B. Solano | 2026-08-06 | - |
@@ -93,23 +93,23 @@ Source: ALX4100-ERR rev 3.1 (2025-11-12). All 14 ALX-4100 errata are listed. Car
 | ALX4100-E13 | resolved - QSPI-CTL v2.3 (fixed in v2.2, same release line); KESTREL uses 133 MHz SDR | Yes | QSPI-CTL v2.3 | R. Lindqvist | 2026-08-06 | QSPI-CTL RN rev 7: v2.3 fixed-issue list includes QSPC-0231 (DTR read sampling at 200 MHz), carried from v2.2 |
 | ALX4100-E14 | resolved - NPU-TILE v3.0 includes fix; covergroup cg_npu_sparse_decomp_zero_blk (Escape-history) | Yes | NPU-TILE v3.0 | V. Halloran | 2026-08-06 | - |
 
-Result: 11 carry-forward errata reviewed; 10 resolved by IP version; 1 in-house redesign (E03) with verification tracked in KST-VPLAN-010 / KST-COV-011. 3 errata not carried forward (E02, E06, E09).
+Result: 11 carry-forward errata reviewed; 10 resolved by IP version; 1 in-house redesign (E03) verified (PCIE-1187 closed; coverage reported in KST-COV-011 rev C). 3 errata not carried forward (E02, E06, E09).
 
 ## 6. Hash check (CHK-IP-02)
 
 Hash check (CHK-IP-02): 25/25 match
 
-Method: the sha256 of each delivered IP package in the IP vault is compared with the files referenced by the implementation database used to build netlist kst_top_nl_2026.08.31 (RTL file lists, LIB, LEF and GDS views). In-house IP is compared against the tagged release in the design repository. Run 2026-08-31 by B. Solano; log ipbom_hash_2026-08-31.log. Result: 25/25 match, 0 mismatches, 0 missing views.
+Method: the sha256 of each delivered IP package in the IP vault is compared with the files referenced by the implementation database used to build netlist kst_top_nl_2026.09.19 (RTL file lists, LIB, LEF and GDS views). In-house IP is compared against the tagged release in the design repository. Run 2026-09-20 by B. Solano; log ipbom_hash_2026-09-20.log. Result: 25/25 match, 0 mismatches, 0 missing views.
 
 ## 7. Approvals
 
 | Role | Name | Date |
 |---|---|---|
-| Prepared: IP Manager | Beatriz Solano | 2026-08-31 |
-| Reviewed: Memory Subsystem Owner (MIPV IP) | Anjali Deshmukh | 2026-08-28 |
-| Reviewed: PCIe Subsystem Owner | Leo Brandt | 2026-08-28 |
-| Reviewed: Physical Design Lead (hard-macro views) | Daniel Achterberg | 2026-08-28 |
-| Approved: Chief Architect | Priya Raghavan | 2026-08-31 |
+| Prepared: IP Manager | Beatriz Solano | 2026-09-21 |
+| Reviewed: Memory Subsystem Owner (MIPV IP) | Anjali Deshmukh | 2026-09-21 |
+| Reviewed: PCIe Subsystem Owner | Leo Brandt | 2026-09-21 |
+| Reviewed: Physical Design Lead (hard-macro views) | Daniel Achterberg | 2026-09-21 |
+| Approved: Chief Architect | Priya Raghavan | 2026-09-21 |
 
 ## 8. Revision history
 
@@ -119,3 +119,4 @@ Method: the sha256 of each delivered IP package in the IP vault is compared with
 | B | 2026-08-31 | ECO-B-004: MC-LP5X and PHY-LP5X-N5 moved from the 2.6.x maintenance line to v2.7.0 (includes LPX-1182, fix for ALX4100-E07); PHY GDS/LEF/LIB and training firmware re-delivered; rows 9 and 10 and errata cross-check E04/E07 updated. |
 | B | 2026-08-31 | CHG-B-002: GPIO_B I/O cells IO_GPIO_1V2 -> IO_GPIO_1V8 (16 pad-ring cells); GPIO-N5-LIB version unchanged (v1.3); row 3 usage note updated. |
 | B | 2026-08-31 | Hash check re-run on netlist kst_top_nl_2026.08.31: 25/25 match. |
+| C | 2026-09-21 | Row 8: l1ss_ctl v3.0 -> v3.0.1 (ECO-C-003, PCIE-1187); E03 cross-check updated to resolved. Third-party IP versions and deliverables unchanged. Hash check re-run on netlist kst_top_nl_2026.09.19: 25/25 match. |

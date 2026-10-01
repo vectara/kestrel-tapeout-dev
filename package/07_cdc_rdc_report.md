@@ -4,22 +4,22 @@
 |---|---|
 | Doc ID | KST-CDC-030 |
 | Title | CDC / RDC Sign-off Report |
-| Revision | B (supersedes A) |
-| Date | 2026-09-02 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-23 |
 | Owner | Hiroshi Tanabe (CDC/RDC Owner) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 (final sign-off) |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
 ## 1. Purpose and scope
 
-This report records clock-domain-crossing (CDC) and reset-domain-crossing (RDC) sign-off for the full KESTREL chip (`kst_top`) on netlist **kst_top_nl_2026.08.31**, for TRR-2 (2026-09-04). Rules: ALD-QA-CHK-007 rev 7.2, CHK-CDC-01 to CHK-CDC-06. Clock plan and power states: KST-ARCH-001. Synchronous paths inside a clock group: KST-STA-020.
+This report records clock-domain-crossing (CDC) and reset-domain-crossing (RDC) sign-off for the full KESTREL chip (`kst_top`) on netlist **kst_top_nl_2026.09.19**, for TRR-3 (2026-09-25). Rules: ALD-QA-CHK-007 rev 7.2, CHK-CDC-01 to CHK-CDC-06. Clock plan and power states: KST-ARCH-001. Synchronous paths inside a clock group: KST-STA-020.
 
 Hard macros (PCIe PHY, LPDDR5X controller and PHY, PLLs, OTP) use vendor CDC abstract models at the KST-IPBOM-050 versions for this package. PCIE1 (`u_pcie1_wrap`) is fused off (`FUSE_PCIE1_DIS=1`) but present in silicon, so its crossings are analyzed like any other block.
 
 ## 2. Sign-off summary
 
-**Result: 1,286 crossings; 1,244 clean; 42 waived; 0 unwaived.** Reset-domain analysis: 320 RDC paths, 0 unwaived. CDC/RDC status for TRR-2: **GREEN**.
+**Result: 1,286 crossings; 1,244 clean; 42 waived; 0 unwaived.** Reset-domain analysis: 320 RDC paths, 0 unwaived. CDC/RDC status for TRR-3: **GREEN**.
 
 | Rule | Requirement | Result | Status |
 |---|---|---|---|
@@ -36,7 +36,7 @@ Hard macros (PCIe PHY, LPDDR5X controller and PHY, PLLs, OTP) use vendor CDC abs
 
 | Item | Value |
 |---|---|
-| Design / netlist | `kst_top`, kst_top_nl_2026.08.31; runs 2026-08-31 .. 2026-09-01 |
+| Design / netlist | `kst_top`, kst_top_nl_2026.09.19; runs 2026-09-20 .. 2026-09-21 |
 | Structural CDC tool | Clock/reset inference, synchronizer recognition, reconvergence, glitch and logic-before-synchronizer checks |
 | Formal CDC/RDC tool | Handshake protocol, gray-code and pulse-spacing properties, stability SVAs, reset ordering, RDC |
 | Logic simulator | Metastability-injection simulation (random 0/1-cycle delay on every recognized synchronizer): 214 SoC tests, 0 failures |
@@ -325,8 +325,8 @@ Open CDC/RDC items: none. All CHK-CDC rules PASS on this netlist.
 
 | Role | Name | Action | Date |
 |---|---|---|---|
-| CDC/RDC Owner | Hiroshi Tanabe | Signed off | 2026-09-02 |
-| Quality & Tape-out Gatekeeper | Oren Feldman | Received for TRR-2 | 2026-09-02 |
+| CDC/RDC Owner | Hiroshi Tanabe | Signed off | 2026-09-23 |
+| Quality & Tape-out Gatekeeper | Oren Feldman | Received for TRR-3 | 2026-09-23 |
 
 ## Revision history
 
@@ -334,16 +334,13 @@ Open CDC/RDC items: none. All CHK-CDC rules PASS on this netlist.
 |---|---|---|---|
 | A | 2026-08-12 | Hiroshi Tanabe | Initial release for TRR-1 on netlist kst_top_nl_2026.08.07: 1,284 crossings; 1,241 clean; 43 waived; 0 unwaived. |
 | B | 2026-09-02 | Hiroshi Tanabe | Full re-run on kst_top_nl_2026.08.31. CDC-0147 (wake_req_q) re-classified quasi_static -> pulse after TRR-1 (one aon_clk cycle, 40 ns, shorter than the 64 ns LP-IDLE core_clk period; CHK-CDC-04). ECO-B-005 adds u_core/u_pmu_if/u_wake_psync (toggle, SYNC3_X2, edge detect, ack toggle); CDC-0147 Clean, W-CDC-022 withdrawn. +2 clean crossings (CDC-0451, CDC-0452), +2 RDC paths (clean by reset ordering and the psync reset qualifier). Totals: 1,286 crossings; 1,244 clean; 42 waived; 0 unwaived. |
+| C | 2026-09-23 | Hiroshi Tanabe | Full re-run on netlist kst_top_nl_2026.09.19. ECO-C-003 (PCIE-1187, u_l1ss_ctl) re-analyzed, structural and formal: no new crossings (refclk_valid already synchronized by CDC-0135; T_POWER_ON timer on pcie_aux_clk). Totals unchanged: 1,286 crossings; 1,244 clean; 42 waived; 0 unwaived. |
 
 ECO impact on CDC/RDC for this revision:
 
 | Change | CDC/RDC impact |
 |---|---|
-| ECO-B-001 (NoC router credit return) | core_clk-internal; no crossing change |
-| ECO-B-002 (NPU DMA interrupt coalescing) | npu_clk side, upstream of CDC-0103; no crossing change |
-| ECO-B-003 (u_sec_encl/u_keyldr delay cells) | sec_clk-internal; no crossing change |
-| ECO-B-004 (LPDDR5X IP drop, KST-IPBOM-050) | Abstract models refreshed; boundary crossings and W-CDC-014..016 register lists unchanged |
-| ECO-B-005 (u_core/u_pmu_if/u_wake_psync) | CDC-0147 now PULSE_SYNC; +2 crossings; W-CDC-022 withdrawn |
-| ECO-B-006 (I2C0 glitch-filter default) | Reset value only; no crossing change |
-| CHG-B-002 (GPIO_B I/O cells) | Pad-cell swap; input synchronizers unchanged |
+| ECO-C-001 (u_periph spare-cell tie-off) | No crossing change |
+| ECO-C-002 (u_sec_encl/u_keyldr delay cell) | sec_clk-internal; no crossing change |
+| ECO-C-003 (u_pcie0_wrap/u_l1ss_ctl, PCIE-1187) | pcie_aux_clk logic only; no new crossings; CDC-0134 to CDC-0138 Clean |
 

@@ -4,75 +4,73 @@
 |---|---|
 | Doc ID | KST-COV-011 |
 | Title | Functional & Code Coverage Report |
-| Revision | B (supersedes A) |
-| Date | 2026-09-02 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-23 |
 | Owner | Tomasz Wierzbicki (Verification Lead) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
 ## 1. Summary
 
-Package B: RTL kst_rtl_2026.08.28, netlist kst_top_nl_2026.08.31. Nightly regression is 99.6% over three consecutive nightlies; 0 open P1/P2 bugs; code coverage meets CHK-VER-01 on every measured block after approved exclusions CE-001 to CE-006; SDF-annotated GLS on the package-B netlist passes at the min corner (9/9); at the max corner eight tests were re-run on 08.31 and pass, and gls_secure_boot_auth (SEC partition, ECO-B-003) carries its package-A result because the ECO board assessed ECO-B-003 as a hold-only (min-corner) change.
+Package C: RTL kst_rtl_2026.09.17, netlist kst_top_nl_2026.09.19. Nightly regression is 99.8% over three consecutive nightlies; 0 open P1/P2 bugs; code coverage meets CHK-VER-01 on every measured block after approved exclusions CE-001 to CE-006; SDF-annotated GLS on the package-C netlist passes at the min and max corners.
 
-TB-B-001 added 14 directed L1.2 sequences and the constrained-random L1SS library. cg_pcie0_l12_entry_exit rose from 71.0% to 91.1% (113/124); 11 bins remain uncovered (section 7.1). All other in-scope covergroups meet target. The four PCIE1 covergroups are excluded under CE-004 (PCIE1 fused off).
-
-The PCIe Subsystem Owner requested coverage waiver CW-PCIE-003 for cg_pcie0_l12_entry_exit on 2026-09-02. Status: Pending (section 9).
+TB-C-001 closed cg_pcie0_l12_entry_exit to 96.8% (120/124); all 57 in-scope covergroups meet their tier target. The new directed test l12_clkreq_tpoweron_gen5 found PCIE-1187 (P1) on 2026-09-10; it was fixed by RTL ECO-C-003, verified and closed on 2026-09-17 (section 4.3). CW-PCIE-003 was rejected by the chair (2026-09-08, TRR-2 AI-12); the requester withdrew the record on 2026-09-22 once the target was met. The four PCIE1 covergroups are excluded under CE-004 (PCIE1 fused off).
 
 | Criterion | Rule | Threshold | Result | Status |
 |---|---|---|---|---|
 | Code coverage per block | CHK-VER-01 | Line >= 98.0%, branch >= 95.0%, toggle >= 95.0%, FSM state 100%, FSM transition >= 95.0% | All 14 measured blocks at target after approved exclusions | PASS |
-| Functional coverage per covergroup | CHK-VER-02 | Tier-1 >= 95.0%, Tier-2 >= 90.0%, Tier-3 >= 80.0% (non-blocking) | 56 of 57 in-scope covergroups at target; cg_pcie0_l12_entry_exit 91.1% (113/124) | Open - closure in progress |
+| Functional coverage per covergroup | CHK-VER-02 | Tier-1 >= 95.0%, Tier-2 >= 90.0%, Tier-3 >= 80.0% (non-blocking) | 57 of 57 in-scope covergroups at target; cg_pcie0_l12_entry_exit 96.8% (120/124) | PASS |
 | Bug database | CHK-VER-03 | 0 open P1/P2; every P3 triaged | 0 open P1/P2; all open P3 triaged with owner | PASS |
-| Nightly regression | CHK-VER-04 | >= 99.5% on 3 consecutive nightlies | 99.6% (3-run aggregate; each nightly >= 99.5%) | PASS |
+| Nightly regression | CHK-VER-04 | >= 99.5% on 3 consecutive nightlies | 99.8% (3-run aggregate; each nightly >= 99.5%) | PASS |
 | Coverage exclusions | CHK-VER-05 | Approved record per exclusion | CE-001 to CE-006, each signed by Verification Lead and Chief Architect | PASS |
-| Gate-level simulation | CHK-VER-06 | Boot, reset, low-power at min and max SDF | 9/9 at min SDF on kst_top_nl_2026.08.31; max SDF: 8/9 re-run, gls_secure_boot_auth (SEC, ECO-B-003) carried from package A | PASS |
-| Coverage waivers | KST-VPLAN-010 section 8 | Signed before TRR | CW-PCIE-003 requested 2026-09-02, Pending | - |
+| Gate-level simulation | CHK-VER-06 | Boot, reset, low-power at min and max SDF | 9 of 9 tests pass at both corners on kst_top_nl_2026.09.19 | PASS |
+| Coverage waivers | KST-VPLAN-010 section 8 | Signed before TRR | CW-PCIE-003 withdrawn 2026-09-22 (target met); none in effect | - |
 
 ## 2. Snapshot and environment
 
 | Item | Value |
 |---|---|
-| RTL tag | kst_rtl_2026.08.28 (package-A RTL + RTL changes of ECO-B-001, ECO-B-002, ECO-B-004..ECO-B-006; ECO-B-003 is physical-only; LEC-matched to the netlist) |
-| Sign-off netlist (GLS) | kst_top_nl_2026.08.31; SDF written 2026-08-31 by the sign-off STA tool (SDF-generation run sta_kst_0831_sdf, same netlist, SPEF and SDC r4.2 as sign-off run sta_kst_0902_full) |
-| Regression window | Nightlies 2026-08-30 .. 2026-09-01 |
-| Coverage database | cov_kst_2026.09.01_merged (3 nightlies plus weekly seed expansion) |
+| RTL tag | kst_rtl_2026.09.17 (package-B RTL + RTL change of ECO-C-003; ECO-C-001/ECO-C-002 are physical-only; LEC-matched to the netlist) |
+| Sign-off netlist (GLS) | kst_top_nl_2026.09.19; SDF written 2026-09-19 by the sign-off STA tool (SDF-generation run sta_kst_0919_sdf, same netlist and SPEF as sta_kst_0922_full) |
+| Regression window | Nightlies 2026-09-19 .. 2026-09-21 |
+| Coverage database | cov_kst_2026.09.21_merged (3 nightlies on kst_rtl_2026.09.17 plus the 2026-09-13 weekly 5x seed expansion for blocks without an RTL change; PCIE0 re-collected from scratch after ECO-C-003, nightlies only) |
 | Simulator | Logic simulator, 4-state, UVM (IEEE 1800.2-2020) |
-| Emulation build | emu_kst_0828 |
+| Emulation build | emu_kst_0917 |
 | Exclusion files | cov_excl/CE-001.el .. cov_excl/CE-006.el (version-controlled) |
-| Verification plan | KST-VPLAN-010 rev B |
+| Verification plan | KST-VPLAN-010 rev C |
 
 ## 3. Regression results
 
 | Nightly | RTL tag | Tests run | Passed | Failed | Pass rate |
 |---|---|---|---|---|---|
-| 2026-08-30 | kst_rtl_2026.08.28 | 19,056 | 18,984 | 72 | 99.6% |
-| 2026-08-31 | kst_rtl_2026.08.28 | 19,056 | 18,975 | 81 | 99.6% |
-| 2026-09-01 | kst_rtl_2026.08.28 | 19,056 | 18,982 | 74 | 99.6% |
-| 3-run aggregate | | 57,168 | 56,941 | 227 | 99.6% |
+| 2026-09-19 | kst_rtl_2026.09.17 | 19,262 | 19,227 | 35 | 99.8% |
+| 2026-09-20 | kst_rtl_2026.09.17 | 19,262 | 19,221 | 41 | 99.8% |
+| 2026-09-21 | kst_rtl_2026.09.17 | 19,262 | 19,224 | 38 | 99.8% |
+| 3-run aggregate | | 57,786 | 57,672 | 114 | 99.8% |
 
-Failure triage, nightly 2026-09-01 (74 failures):
+Failure triage, nightly 2026-09-21 (38 failures):
 
 | Category | Count | Disposition |
 |---|---|---|
-| Testbench or VIP issue (seed-specific constraint conflicts, scoreboard tolerance) | 32 | Filed against the testbench; no RTL change |
-| Infrastructure (license wait, farm timeouts) | 24 | Re-run clean |
-| Known open P3/P4 bugs (triaged, with owner) | 18 | Tracked in the bug DB |
+| Testbench or VIP issue (seed-specific constraint conflicts, scoreboard tolerance) | 16 | Filed against the testbench; no RTL change |
+| Infrastructure (license wait, farm timeouts) | 13 | Re-run clean |
+| Known open P3/P4 bugs (triaged, with owner) | 9 | Tracked in the bug DB |
 | RTL defects, P1/P2 | 0 | - |
 
 ## 4. Bug status
 
-### 4.1 Bug database at report date (2026-09-02)
+### 4.1 Bug database at report date (2026-09-23)
 
 | Priority | Filed | Closed | Open | Open, triaged with owner |
 |---|---|---|---|---|
-| P1 | 41 | 41 | 0 | - |
-| P2 | 191 | 191 | 0 | - |
-| P3 | 640 | 626 | 14 | 14 |
-| P4 | 634 | 609 | 25 | 25 |
-| Total | 1,506 | 1,467 | 39 | 39 |
+| P1 | 42 | 42 | 0 | - |
+| P2 | 193 | 193 | 0 | - |
+| P3 | 648 | 639 | 9 | 9 |
+| P4 | 641 | 619 | 22 | 22 |
+| Total | 1,524 | 1,493 | 31 | 31 |
 
-P2 filed/closed rose by 4 since package A (187 to 191): NOC-0271 and NPU-2248 (section 4.2) and 2 reports closed as not-a-bug (testbench scoreboard misconfiguration, re-filed against the testbench; no RTL change). Section 4.2 lists only bugs closed by a design change.
+Since package A (P2 187), P2 filed/closed includes 4 reports closed without a design change: 2 not-a-bug (testbench scoreboard misconfiguration, package B) and 2 raised during PCIE-1187 triage and closed as duplicates of PCIE-1187 (package C). Section 4.2 lists only bugs closed by a design change.
 
 ### 4.2 P1/P2 bugs closed since 2026-07-01
 
@@ -85,6 +83,15 @@ P2 filed/closed rose by 4 since package A (187 to 191): NOC-0271 and NPU-2248 (s
 | SEC-0309 | P1 | AES-GCM tag compare exited early on first mismatching byte | RTL fix before freeze | 2026-07-08 |
 | NOC-0271 | P2 | Router (2,1) credit-return glitch on VC switch | ECO-B-001 | 2026-08-24 |
 | NPU-2248 | P2 | DMA completion-interrupt coalescing counter not cleared on channel reset | ECO-B-002 | 2026-08-25 |
+| PCIE-1187 | P1 | L1.2 exit at Gen5: PHY released from P1.2 before refclk_valid (section 4.3) | ECO-C-003 | 2026-09-17 |
+
+### 4.3 Bugs found during closure
+
+| Bug | Priority | Found | Found by | Description | Fix | Status |
+|---|---|---|---|---|---|---|
+| PCIE-1187 | P1 | 2026-09-10 | New directed test l12_clkreq_tpoweron_gen5 (TB-C-001) | u_pcie0_wrap/u_l1ss_ctl released the PHY from P1.2 before refclk_valid when CLKREQ# re-asserted within 2 us of T_POWER_ON expiry at Gen5: the re-assert branch of the exit FSM restarted T_POWER_ON without clearing tpoweron_done, so the stale flag released P1.2; LTSSM went to Detect on L1.2 exit (same failure signature as ALX4100-E03) | RTL ECO-C-003: tpoweron_done cleared on CLKREQ# re-assertion; every P1.2 exit branch re-qualified with synchronized refclk_valid | Verified, closed 2026-09-17 |
+
+Fix verification: l12_clkreq_tpoweron_gen5 passes on all 164 offset/T_POWER_ON combinations; SVA a_l1ss_p12_exit_refclk_valid passes in simulation and is fully proven by formal on u_l1ss_ctl; full PCIE0 regression and l1ss_cr_lib (600 seeds per nightly, Gen1-Gen5) are clean on kst_rtl_2026.09.17; gls_pcie0_l12_entry_exit passes on kst_top_nl_2026.09.19 at both SDF corners. 0 open P1/P2 at TRR-3.
 
 ## 5. Code coverage per block
 
@@ -96,7 +103,7 @@ Measured on the merged database after applying approved exclusions (section 8). 
 | GBUF | u_gbuf | 99.6% | 98.2% | 97.9% | 100.0% | 100.0% | CE-006 | PASS |
 | CPU | u_cpu | 98.7% | 96.2% | 95.9% | 100.0% | 97.3% | CE-001, CE-006 | PASS |
 | NOC | u_noc | 99.1% | 96.9% | 96.2% | 100.0% | 98.8% | CE-005 | PASS |
-| PCIE0 | u_pcie0_wrap | 98.9% | 96.4% | 95.8% | 100.0% | 97.6% | - | PASS |
+| PCIE0 | u_pcie0_wrap | 98.9% | 96.5% | 95.9% | 100.0% | 97.6% | - | PASS |
 | PCIE1 | u_pcie1_wrap (PD_PCIE1 logic) | Excluded (CE-004) | Excluded (CE-004) | Excluded (CE-004) | Excluded (CE-004) | Excluded (CE-004) | CE-004 | Excluded |
 | PCIE1 isolation | u_pcie1_wrap/u_pd_ctl, fuse decode | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | - | PASS |
 | MEM | u_ddr_ss | 98.6% | 96.0% | 95.6% | 100.0% | 96.9% | CE-002 | PASS |
@@ -112,7 +119,7 @@ Measured on the merged database after applying approved exclusions (section 8). 
 
 | Tier | Covergroups | At or above target | Below target |
 |---|---|---|---|
-| Tier-1 | 37 | 36 | 1 |
+| Tier-1 | 37 | 37 | 0 |
 | Tier-2 | 15 | 15 | 0 |
 | Tier-3 | 5 | 5 | 0 |
 | Excluded (CE-004) | 4 | - | - |
@@ -157,13 +164,13 @@ Measured on the merged database after applying approved exclusions (section 8). 
 | cg_aon_wake_sources | Tier-1 | 46/48 | 95.8% | 95.0% | PASS |
 | cg_aon_fuse_shadow_load | Tier-1 | 28/28 | 100.0% | 95.0% | PASS |
 | cg_aon_rtc_timer | Tier-3 | 21/24 | 87.5% | 80.0% | PASS (non-blocking) |
-| cg_pcie0_ltssm | Tier-1 | 402/417 | 96.4% | 95.0% | PASS |
+| cg_pcie0_ltssm | Tier-1 | 403/417 | 96.6% | 95.0% | PASS |
 | cg_pcie0_tlp_types | Tier-1 | 184/186 | 98.9% | 95.0% | PASS |
 | cg_pcie0_aer | Tier-1 | 61/62 | 98.4% | 95.0% | PASS |
 | cg_pcie0_eq_presets | Tier-1 | 98/99 | 99.0% | 95.0% | PASS |
 | cg_pcie0_aspm_l1 | Tier-1 | 42/43 | 97.7% | 95.0% | PASS |
 | cg_pcie0_l11_entry_exit | Tier-1 | 41/42 | 97.6% | 95.0% | PASS |
-| cg_pcie0_l12_entry_exit | Tier-1 | 113/124 | 91.1% | 95.0% | Below target - closure in progress; CW-PCIE-003 pending (section 9) |
+| cg_pcie0_l12_entry_exit | Tier-1 | 120/124 | 96.8% | 95.0% | PASS |
 | cg_pcie0_reset_flr | Tier-1 | 30/30 | 100.0% | 95.0% | PASS |
 | cg_pcie0_msix_sriov | Tier-2 | 88/96 | 91.7% | 90.0% | PASS |
 | cg_pcie1_ltssm | Excluded | 0/398 | 0.0% | Excluded (CE-004) | Excluded (CE-004) |
@@ -185,21 +192,14 @@ Measured on the merged database after applying approved exclusions (section 8). 
 
 ### 7.1 cg_pcie0_l12_entry_exit
 
-11 of 124 bins uncovered (113/124 = 91.1%) after TB-B-001. 25 of the 36 bins open at package A are now covered.
+4 of 124 bins uncovered (120/124 = 96.8%) after TB-C-001. PCIE0 coverage was re-collected from scratch on kst_rtl_2026.09.17 after the ECO-C-003 RTL change to u_l1ss_ctl.
 
 | Bin | Coverpoint / cross | Hits | Closure plan | Owner |
 |---|---|---|---|---|
-| clkreq_reassert_during_tpoweron__gen5 | cx_exit_trigger_x_rate | 0 | Gen5 variant planned with PIPE PHY BFM Gen5 P1.2 exit-latency update | Leo Brandt |
-| ltr_update__gen5 | cx_exit_trigger_x_rate | 0 | Gen5 variant of l12_ltr_update_exit_gen4 planned | Leo Brandt |
-| perst_assert__gen4 | cx_exit_trigger_x_rate | 0 | Higher-rate variant of l12_perst_in_l12_gen3 planned | Leo Brandt |
-| perst_assert__gen5 | cx_exit_trigger_x_rate | 0 | Higher-rate variant of l12_perst_in_l12_gen3 planned | Leo Brandt |
-| ep_wake__gen5 | cx_exit_trigger_x_rate | 0 | Gen5 variant of l12_ep_wake_exit_gen4 planned | Leo Brandt |
-| b2b_entry_lt_10us__gen3 | cx_b2b_x_rate | 0 | Higher-rate variant of l12_b2b_entry_gen2 planned | Leo Brandt |
-| b2b_entry_lt_10us__gen4 | cx_b2b_x_rate | 0 | Higher-rate variant of l12_b2b_entry_gen2 planned | Leo Brandt |
-| b2b_entry_lt_10us__gen5 | cx_b2b_x_rate | 0 | Higher-rate variant of l12_b2b_entry_gen2 planned | Leo Brandt |
-| tpoweron_130us_x_ltr_update | cx_tpoweron_x_exit | 0 | Constraint update in l1ss_cr_lib (T_POWER_ON 130 us weighting) | Tomasz Wierzbicki |
-| tpoweron_130us_x_perst_assert | cx_tpoweron_x_exit | 0 | Constraint update in l1ss_cr_lib (T_POWER_ON 130 us weighting) | Tomasz Wierzbicki |
-| pci_pm_d3hot_x_ep_wake | cx_entry_x_exit | 0 | D3hot exit on endpoint wake needs PME sequencing in the host VIP; update planned | Tomasz Wierzbicki |
+| pci_pm_d3hot_x_ep_wake | cx_entry_x_exit | 0 | Target met; D3hot exit on endpoint wake needs PME sequencing in the host VIP, scheduled post-TRR (non-blocking) | Tomasz Wierzbicki |
+| tpoweron_130us_x_perst_assert | cx_tpoweron_x_exit | 0 | Target met; directed variant scheduled post-TRR (non-blocking) | Leo Brandt |
+| perst_assert__gen1 | cx_exit_trigger_x_rate | 0 | Target met; hit in the package-B database; PCIE0 coverage was reset after the ECO-C-003 RTL change to u_l1ss_ctl; l12_perst_in_l12 draws its link rate per seed (Gen1/Gen2) and the three post-ECO nightlies (2026-09-19..21) all drew Gen2; l1ss_cr_lib weights perst_assert low because PERST# ends the residency; fixed-rate Gen1 run scheduled post-TRR (non-blocking) | Leo Brandt |
+| b2b_entry_lt_10us__gen3 | cx_b2b_x_rate | 0 | Target met; Gen3 variant of l12_b2b_entry scheduled post-TRR (non-blocking) | Leo Brandt |
 
 ### 7.2 Other covergroups below 100%
 
@@ -234,7 +234,7 @@ All covergroups in this table are at or above their tier target; uncovered bins 
 | cg_sec_trng_health | Tier-2 | 1 | adaptive_prop_fail_x_reseed |
 | cg_aon_wake_sources | Tier-1 | 2 | smbus_alert__sleep__simul_gpio, timer__sleep__simul_smbus_alert |
 | cg_aon_rtc_timer | Tier-3 | 3 | alarm_at_rollover, alarm_write_during_tick, rollover_x_sleep_entry |
-| cg_pcie0_ltssm | Tier-1 | 15 | Loopback follower at Gen4/Gen5 x8/x4 (4); Recovery.Speed Gen5 -> Gen2 on EQ failure (2); Disabled from Recovery at Gen3-Gen5 (3); Hot Reset from Recovery.Idle at Gen1-Gen5 (5); Polling.Compliance via Enter_Compliance at x1 (1) |
+| cg_pcie0_ltssm | Tier-1 | 14 | Loopback follower at Gen4/Gen5 x8/x4 (4); Recovery.Speed Gen5 -> Gen2 on EQ failure (2); Disabled from Recovery at Gen3-Gen5 (3); Hot Reset from Recovery.Idle at Gen2-Gen5 (4); Polling.Compliance via Enter_Compliance at x1 (1) |
 | cg_pcie0_tlp_types | Tier-1 | 2 | atomic_cas_128b__tc7, msg_vendor_type1__ro_ido |
 | cg_pcie0_aer | Tier-1 | 1 | surprise_down__header_log_overflow |
 | cg_pcie0_eq_presets | Tier-1 | 1 | gen5_phase3_preset_p10_reject |
@@ -265,27 +265,27 @@ All exclusions satisfy CHK-VER-05: the excluded logic is unreachable in ALX-5100
 
 Waivers follow KST-VPLAN-010 section 8.2 (risk assessment; signatures of the Verification Lead and the Chief Architect before the TRR at which the waiver is used).
 
-One waiver request is open for TRR-2. CW-PCIE-001 and CW-PCIE-002 are closed.
+No coverage waivers are in effect for TRR-3. CW-PCIE-003 was withdrawn after cg_pcie0_l12_entry_exit reached target.
 
 | ID | Covergroup | Requested | Requested by | Rationale | Approver(s) | Status |
 |---|---|---|---|---|---|---|
 | CW-PCIE-001 | cg_pcie0_eq_presets | 2026-05-29 | Leo Brandt | Gen5 phase-3 preset bins pending host VIP update (RTL-freeze milestone only) | Tomasz Wierzbicki, Priya Raghavan | Closed 2026-06-26 (target met) |
 | CW-PCIE-002 | cg_pcie0_msix_sriov | 2026-06-05 | Leo Brandt | VF MSI-X bins pending SR-IOV sequence library (RTL-freeze milestone only) | Tomasz Wierzbicki, Priya Raghavan | Closed 2026-07-10 (target met) |
-| CW-PCIE-003 | cg_pcie0_l12_entry_exit (113/124, 91.1%) | 2026-09-02 | Leo Brandt | remaining bins are Gen5 corner cases; to be covered in post-silicon validation | Tomasz Wierzbicki (Verification Lead): not signed; Priya Raghavan (Chief Architect): not signed | Pending |
+| CW-PCIE-003 | cg_pcie0_l12_entry_exit (91.1% at request) | 2026-09-02 | Leo Brandt | remaining bins are Gen5 corner cases; to be covered in post-silicon validation | Tomasz Wierzbicki (Verification Lead), Priya Raghavan (Chief Architect): not signed | Rejected 2026-09-08 (TRR-2 AI-12); request record closed 2026-09-22: Withdrawn by requester (target met) |
 
 ## 10. Gate-level simulation
 
-Netlist kst_top_nl_2026.08.31; SDF from the sign-off STA tool; runs 2026-08-31 .. 2026-09-01. Timing checks enabled on all sequential cells; X-propagation monitored. This suite is the affected-block GLS set of CHK-GOV-02 and is run on the final netlist of each package, after its last ECO, rather than per change; every netlist ECO in KST-ECO-062 maps to at least one test (NoC, GBUF and NPU datapath: gls_warm_reset and gls_npu_smoke; CPU L2 and PLIC: gls_por_qspi_boot and gls_wdt_reset; boot, reset, security and low-power logic: the remaining tests). The ECO board assessed ECO-B-003 (hold delay cells) as a min-corner change, so gls_secure_boot_auth was re-run with min SDF only and its max-SDF result is carried from package A.
+Netlist kst_top_nl_2026.09.19; SDF from the sign-off STA tool; runs 2026-09-20 .. 2026-09-21. Timing checks enabled on all sequential cells; X-propagation monitored. This suite is the affected-block GLS set of CHK-GOV-02 and is run on the final netlist of each package, after its last ECO, rather than per change; every netlist ECO in KST-ECO-062 maps to at least one test (NoC, GBUF and NPU datapath: gls_warm_reset and gls_npu_smoke; CPU L2 and PLIC: gls_por_qspi_boot and gls_wdt_reset; boot, reset, security and low-power logic: the remaining tests).
 
 | Test | Scenario | Min SDF (ff_0p825v_m40c_cbest_ccbest) | Max SDF (ss_0p675v_m40c_cworst_ccworst) |
 |---|---|---|---|
 | gls_por_qspi_boot | POR, fuse-shadow load, boot ROM to BL1 fetch with u_keyldr key_load_done forced by the testbench (key ladder covered by gls_secure_boot_auth), QSPI0 1-1-4 SDR read of BL1 | PASS | PASS |
-| gls_secure_boot_auth | Root-key load from the OTP model, ECDSA P-384 verification of BL1 | PASS | Not re-run on 08.31 (package-A result, kst_top_nl_2026.08.07: PASS) |
+| gls_secure_boot_auth | Root-key load from the OTP model, ECDSA P-384 verification of BL1 | PASS | PASS |
 | gls_warm_reset | Warm reset under NoC and NPU traffic | PASS | PASS |
 | gls_wdt_reset | Watchdog-expiry reset | PASS | PASS |
 | gls_lp_idle_entry_exit | ACTIVE -> LP-IDLE -> ACTIVE, timer wake | PASS | PASS |
 | gls_sleep_gpio_wake | ACTIVE -> SLEEP -> ACTIVE, GPIO wake | PASS | PASS |
-| gls_pcie0_l12_entry_exit | L1.2 entry/exit, host CLKREQ# exit, Gen1 PIPE model | PASS | PASS |
+| gls_pcie0_l12_entry_exit | L1.2 entry/exit: host CLKREQ# exit and CLKREQ# re-assert during T_POWER_ON (PCIE-1187 scenario), Gen1 PIPE model | PASS | PASS |
 | gls_ddr_init | LPDDR5X init and training with the PHY simulation model | PASS | PASS |
 | gls_npu_smoke | Single-tile INT8 GEMM smoke | PASS | PASS |
 
@@ -294,7 +294,7 @@ Netlist kst_top_nl_2026.08.31; SDF from the sign-off STA tool; runs 2026-08-31 .
 | Target | Instance | Properties | Proven | Bounded | Failing |
 |---|---|---|---|---|---|
 | PMU power-state FSM | u_aon/u_pmu | 64 | 64 | 0 | 0 |
-| L1 PM substates sequencer | u_pcie0_wrap/u_l1ss_ctl | 48 | 45 | 3 (depth 120) | 0 |
+| L1 PM substates sequencer (incl. a_l1ss_p12_exit_refclk_valid) | u_pcie0_wrap/u_l1ss_ctl | 49 | 46 (incl. a_l1ss_p12_exit_refclk_valid, full proof) | 3 (depth 120, timer counters abstracted): T_COMMONMODE and LTR entry-timer properties, re-run on kst_rtl_2026.09.17; bound as in rev A | 0 |
 | Security lifecycle FSM | u_sec_encl/u_lc_ctl | 36 | 36 | 0 | 0 |
 | Fuse-shadow load | u_aon/u_fuse_shadow | 22 | 22 | 0 | 0 |
 | Reset sequencer | u_core/u_crg | 30 | 30 | 0 | 0 |
@@ -308,20 +308,18 @@ Netlist kst_top_nl_2026.08.31; SDF from the sign-off STA tool; runs 2026-08-31 .
 
 | ID | Item | Owner | Due |
 |---|---|---|---|
-| OI-1 | cg_pcie0_l12_entry_exit: 11 remaining bins (section 7.1) | Leo Brandt | TRR-3 |
-| OI-2 | PIPE PHY BFM Gen5 P1.2 exit-latency update | Leo Brandt | 2026-09-11 |
-| OI-3 | Decision on CW-PCIE-003 | Tomasz Wierzbicki, Priya Raghavan | TRR-2 |
-| OI-4 | Tier-3 closure (non-blocking) | Tomasz Wierzbicki | Post-TRR |
+| OI-1 | cg_pcie0_l12_entry_exit: 4 remaining bins, directed runs (non-blocking, target met) | Leo Brandt | Post-TRR |
+| OI-2 | Tier-3 closure (non-blocking) | Tomasz Wierzbicki | Post-TRR |
 
 ## 13. Sign-off
 
 | Item | Signatory | Status | Date |
 |---|---|---|---|
-| Code coverage (CHK-VER-01) | Tomasz Wierzbicki | Signed | 2026-09-02 |
-| Functional coverage (CHK-VER-02) | Tomasz Wierzbicki | Open (cg_pcie0_l12_entry_exit at 91.1%; CW-PCIE-003 pending) | - |
-| Bug database and regression (CHK-VER-03, CHK-VER-04) | Tomasz Wierzbicki | Signed | 2026-09-02 |
+| Code coverage (CHK-VER-01) | Tomasz Wierzbicki | Signed | 2026-09-23 |
+| Functional coverage (CHK-VER-02) | Tomasz Wierzbicki | Signed | 2026-09-23 |
+| Bug database and regression (CHK-VER-03, CHK-VER-04) | Tomasz Wierzbicki | Signed | 2026-09-23 |
 | Coverage exclusions (CHK-VER-05) | Tomasz Wierzbicki, Priya Raghavan | Signed | Per record (section 8) |
-| Gate-level simulation (CHK-VER-06) | Tomasz Wierzbicki | Signed | 2026-09-02 |
+| Gate-level simulation (CHK-VER-06) | Tomasz Wierzbicki | Signed | 2026-09-23 |
 
 ## Revision history
 
@@ -329,3 +327,4 @@ Netlist kst_top_nl_2026.08.31; SDF from the sign-off STA tool; runs 2026-08-31 .
 |---|---|---|---|
 | A | 2026-08-12 | Tomasz Wierzbicki | Released for TRR-1 (RTL kst_rtl_2026.08.06, netlist kst_top_nl_2026.08.07) |
 | B | 2026-09-02 | Tomasz Wierzbicki | TB-B-001 L1.2 tests; L1.2 71.0% -> 91.1%; CW-PCIE-003 requested; coverage databases reset and re-collected on kst_rtl_2026.08.28 for every block with an RTL change: MEM (ECO-B-004, MC-LP5X / PHY-LP5X-N5 v2.7.0 models), NOC (ECO-B-001, u_noc/u_rtr_2_1), NPU (ECO-B-002), PMUIF (ECO-B-005) and PERIPH/I2C0 (ECO-B-006), re-collected with deltas <= 0.2 points, all blocks at target; regression, bug DB and GLS refreshed for kst_top_nl_2026.08.31 |
+| C | 2026-09-23 | Tomasz Wierzbicki | TB-C-001; L1.2 96.8%; PCIE-1187 found/fixed (ECO-C-003); CW-PCIE-003 withdrawn; regression, bug DB and GLS refreshed for kst_top_nl_2026.09.19 |

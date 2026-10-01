@@ -4,10 +4,10 @@
 |---|---|
 | Doc ID | KST-STA-020 |
 | Title | Static Timing Analysis Sign-off Report |
-| Revision | B (supersedes A) |
-| Date | 2026-09-02 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-23 |
 | Owner | Mei-Lin Chou (STA Lead) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
@@ -16,27 +16,27 @@
 | Rev | Date | Author | Change |
 |---|---|---|---|
 | A | 2026-08-12 | Mei-Lin Chou | Initial release for TRR-1 on netlist kst_top_nl_2026.08.07 (ECO-A-001..ECO-A-007). |
-| B | 2026-09-02 | Mei-Lin Chou | Netlist kst_top_nl_2026.08.31 for TRR-2; includes ECO-B-001..ECO-B-006 and CHG-B-002 (see KST-ECO-062). |
-| B | 2026-09-02 | Mei-Lin Chou | ECO-B-003: 2 x DLY2_X1 (u_sec_encl/u_keyldr/eco_b003_dly_0, eco_b003_dly_1) inserted at the D pin of u_sec_encl/u_keyldr/root_key_q_reg_37_; hold in func_ff_0p825v_m40c_cbest_ccbest -0.021 -> 0.015 ns; W-017 withdrawn (KST-STA-021 rev B). |
-| B | 2026-09-02 | Mei-Lin Chou | ECO-B-004: MC-LP5X and PHY-LP5X-N5 netlist and timing models updated to v2.7.0; waivers W-001, W-003, W-012, W-019 re-confirmed. MEM re-timed: the v2.7.0 PHY LIB changes only training/calibration arcs and the controller re-synthesis did not touch u_sched or DFI data paths, so u_ddr_ss slacks are unchanged (within 1 ps). |
-| B | 2026-09-02 | Mei-Lin Chou | ECO-B-005: pulse synchronizer u_core/u_pmu_if/u_wake_psync timed (clock groups unchanged). ECO-B-001, ECO-B-002, ECO-B-006: timed, no new exceptions. |
-| B | 2026-09-02 | Mei-Lin Chou | CHG-B-002: GPIO_B pad cells IO_GPIO_1V8; pad timing models updated. Sections 5-11 and Appendix A regenerated from the full 14-view run sta_kst_0902_full; A.4 adds the ECO-B-003 incremental results. |
+| B | 2026-09-02 | Mei-Lin Chou | Netlist kst_top_nl_2026.08.31 for TRR-2 (ECO-B-001..ECO-B-006, CHG-B-002; KST-ECO-062). ECO-B-003: 2 x DLY2_X1 at root_key_q_reg_37_/D, hold -0.021 -> 0.015 ns, W-017 withdrawn. ECO-B-004: MC-LP5X / PHY-LP5X-N5 v2.7.0 models; u_ddr_ss slacks unchanged. ECO-B-005: u_wake_psync timed. CHG-B-002: IO_GPIO_1V8 pad models. Results from full run sta_kst_0902_full. |
+| C | 2026-09-23 | Mei-Lin Chou | Final netlist kst_top_nl_2026.09.19 for TRR-3; includes ECO-C-001..ECO-C-003. Full 14-view MCMM re-run sta_kst_0922_full (2026-09-22); all sections regenerated. |
+| C | 2026-09-23 | Mei-Lin Chou | ECO-C-002: eco_b003_dly_0/1 removed from the shared D-pin segment of u_sec_encl/u_keyldr/root_key_q_reg_37_; 1 x DLY4_X1 (u_sec_encl/u_keyldr/eco_c002_dly_0) inserted at ecc_bypass_mux_37/I1 (ECC-bypass leg: hold-critical, > 1.5 ns setup margin). The rev B full run showed setup -0.037 ns (func_ss_0p675v_m40c_cworst_ccworst) and -0.012 ns (func_ss_0p675v_125c_cworst_ccworst) on this endpoint after ECO-B-003, which had been verified on hold views only; setup restored to 0.064 / 0.082 ns, hold 0.013 ns. |
+| C | 2026-09-23 | Mei-Lin Chou | ECO-C-001: u_periph spare-cell tie-off cleanup (37 spare cells re-tied, +12 tie cells); no new DRVs. ECO-C-003: PCIE-1187 fix in u_pcie0_wrap/u_l1ss_ctl (tpoweron_done cleared on CLKREQ# re-assertion; P1.2 exit re-qualified with refclk_valid); pcie_aux_clk and pcie_core_clk paths met. |
+| C | 2026-09-23 | Mei-Lin Chou | Process: post-ECO sign-off statements are now quoted from full 14-view MCMM runs only (CHK-STA-03, CHK-GOV-02); incremental runs are used for ECO sizing only. |
 
 ## 1. Executive summary
 
-This report documents static timing sign-off of KESTREL (ALX-5100) for TRR-2. The full 14-view MCMM set (9 functional, 2 scan-shift, 2 scan-capture, 1 MBIST) was timed on netlist kst_top_nl_2026.08.31 (ECO-B-001..ECO-B-006 and CHG-B-002 included) with SI and POCV enabled, against ALD-QA-CHK-007 rev 7.2 CHK-STA-01..07.
+This report documents static timing sign-off of KESTREL (ALX-5100) for TRR-3 (final).
 
-Post-ECO-B-003 incremental timing was run on the hold views (ECO sign-off memo, 2026-08-28); setup timing is unaffected because no setup-critical paths were touched.
+Full 14-view MCMM re-run on final netlist kst_top_nl_2026.09.19 after ECO-C-001..ECO-C-003; all functional views meet setup and hold.
 
-All hold violations closed; W-017 withdrawn.
+SI and POCV were enabled in all views; results are checked against ALD-QA-CHK-007 rev 7.2 CHK-STA-01..07.
 
-In test mode, the 64 trace-funnel endpoints in scan_shift_ss_0p675v_m40c_cworst_ccworst are covered by W-004 (DFT exception TE-DFT-014, approved by the STA Lead and DFT Lead). DRVs: 0 unwaived. STA status for TRR-2: GREEN.
+In test mode, the 64 trace-funnel endpoints in scan_shift_ss_0p675v_m40c_cworst_ccworst are covered by W-004 (DFT exception TE-DFT-014, approved by the STA Lead and DFT Lead). DRVs: 0 unwaived. STA status for TRR-3: GREEN.
 
 | Check (ALD-QA-CHK-007) | Result | Section |
 |---|---|---|
-| CHK-STA-03 view set on sign-off netlist | 14/14 views, run sta_kst_0902_full (2026-09-02) | 5 |
+| CHK-STA-03 view set on sign-off netlist | 14/14 views, run sta_kst_0922_full (2026-09-22) | 5 |
 | CHK-STA-01 functional setup | MET | 5, 6, 8 |
-| CHK-STA-02 functional hold | MET (W-017 withdrawn; fixed by ECO-B-003) | 5, 7 |
+| CHK-STA-02 functional hold | MET | 5, 7 |
 | CHK-STA-04 DRV | 0 unwaived (767 nets waived, tie-off/spare-cell only) | 10 |
 | CHK-STA-05/06 waivers | per KST-STA-021; W-004 is the only waived setup/hold item in test modes | 11 |
 | CHK-STA-07 uncertainty, SI, POCV | 0.050/0.200 ns setup, 0.020 ns hold; SI + POCV on | 3 |
@@ -46,14 +46,13 @@ In test mode, the 64 trace-funnel endpoints in scan_shift_ss_0p675v_m40c_cworst_
 | Item | Value |
 |---|---|
 | Design | ALX-5100 KESTREL top (kst_top), flat full-chip analysis; no abstraction of in-house blocks |
-| Netlist | kst_top_nl_2026.08.31 (post-route, ECO-B-001..ECO-B-006, CHG-B-002) |
-| Parasitics | SPEF per RC corner (cworst_ccworst, rcworst, typical, cbest_ccbest, rcbest), extracted 2026-08-31 |
+| Netlist | kst_top_nl_2026.09.19 (post-route, final; ECO-C-001..ECO-C-003) |
+| Parasitics | SPEF per RC corner (cworst_ccworst, rcworst, typical, cbest_ccbest, rcbest), extracted 2026-09-19 |
 | Constraints | KST_func.sdc r4.2; KST_scan_shift.sdc r3.2; KST_scan_capture.sdc r3.1; KST_mbist.sdc r2.4 |
 | Libraries | STDCELL-N5-H210 v1.2 (SVT/LVT/ULVT, LVF); SRAM-N5-COMP v2.1 macro models; hard-macro timing models per KST-IPBOM-050 (same package revision) |
 | Tool | sign-off STA tool, release 2026.03-SP2, MCMM distributed run (14 views) |
-| Sign-off run | sta_kst_0902_full (2026-09-02), 14/14 views |
-| GLS SDF | sta_kst_0831_sdf (2026-08-31): SDF write only, min and max corners (KST-COV-011 section 10), same netlist and SPEF |
-| ECO timing | sta_kst_0828_b003_inc (2026-08-28): incremental run for ECO-B-003 on hold views func_ff_0p825v_m40c_cbest_ccbest and func_ff_0p825v_m40c_rcbest |
+| Sign-off run | sta_kst_0922_full (2026-09-22), 14/14 views |
+| GLS SDF | sta_kst_0919_sdf (2026-09-19): SDF write only, min (ff_0p825v_m40c_cbest_ccbest) and max (ss_0p675v_m40c_cworst_ccworst) corners, same netlist and SPEF |
 
 ## 3. Methodology
 
@@ -119,15 +118,15 @@ Insertion delay and global skew are from func_ss_0p675v_m40c_cworst_ccworst (sca
 | scan_clk | 200.0 MHz (shift) | 5.000 | OCC test-clock mux | all scan flops (test modes only) | 2.551 | 1.799 | shift trees not balanced across clusters; lockup latches at chain crossings |
 | tck | 50.0 MHz | 20.000 | JTAG pad (test only) | u_dbg | 0.604 | 0.022 | asynchronous to scan_clk |
 
-## 5. MCMM results summary (full 14-view run sta_kst_0902_full, 2026-09-02, netlist kst_top_nl_2026.08.31)
+## 5. MCMM results summary (full 14-view run sta_kst_0922_full, 2026-09-22, netlist kst_top_nl_2026.09.19)
 
 WNS/TNS cover data-path checks (reg2reg, in2reg, reg2out, reg-to-macro, macro-to-reg). Clock-gating, minimum pulse width and DRV are in Section 10.
 
 | View | Setup WNS (ns) | Setup TNS (ns) | Setup viol. endpoints | Hold WNS (ns) | Hold TNS (ns) | Hold viol. endpoints | Waivers applied |
 |---|---|---|---|---|---|---|---|
-| func_ss_0p675v_125c_cworst_ccworst | -0.012 | -0.012 | 1 | 0.018 | 0.000 | 0 | - |
+| func_ss_0p675v_125c_cworst_ccworst | 0.011 | 0.000 | 0 | 0.018 | 0.000 | 0 | - |
 | func_ss_0p675v_125c_rcworst | 0.019 | 0.000 | 0 | 0.021 | 0.000 | 0 | - |
-| func_ss_0p675v_m40c_cworst_ccworst | -0.037 | -0.037 | 1 | 0.016 | 0.000 | 0 | - |
+| func_ss_0p675v_m40c_cworst_ccworst | 0.008 | 0.000 | 0 | 0.016 | 0.000 | 0 | - |
 | func_ss_0p675v_m40c_rcworst | 0.014 | 0.000 | 0 | 0.019 | 0.000 | 0 | - |
 | func_tt_0p750v_85c_typical | 0.142 | 0.000 | 0 | 0.031 | 0.000 | 0 | - |
 | func_ff_0p825v_m40c_cbest_ccbest | 0.206 | 0.000 | 0 | 0.004 | 0.000 | 0 | - |
@@ -146,21 +145,21 @@ Worst five endpoints per view (one path per endpoint).
 
 | View | # | Startpoint | Endpoint | Clock | Slack (ns) |
 |---|---|---|---|---|---|
-| func_ss_0p675v_125c_cworst_ccworst | 1 | u_sec_encl/u_otp_if/otp_rdata_q_reg_37_ | u_sec_encl/u_keyldr/root_key_q_reg_37_ | sec_clk | -0.012 |
-| func_ss_0p675v_125c_cworst_ccworst | 2 | u_cpu/u_core3/u_exu/u_byp/src1_q_reg_41_ | u_cpu/u_core3/u_exu/u_alu0/res_q_reg_63_ | cpu_clk | 0.011 |
-| func_ss_0p675v_125c_cworst_ccworst | 3 | u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_ | u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_ | npu_clk | 0.016 |
-| func_ss_0p675v_125c_cworst_ccworst | 4 | u_ddr_ss/u_mc2/u_sched/u_age_mtx/age_q_reg_12__5_ | u_ddr_ss/u_mc2/u_sched/cmd_sel_q_reg_3_ | mc_clk | 0.024 |
-| func_ss_0p675v_125c_cworst_ccworst | 5 | u_noc/u_rtr_1_3/u_vc_alloc/req_q_reg_17_ | u_noc/u_rtr_1_3/u_sw_alloc/grant_q_reg_4_ | core_clk | 0.029 |
+| func_ss_0p675v_125c_cworst_ccworst | 1 | u_cpu/u_core3/u_exu/u_byp/src1_q_reg_41_ | u_cpu/u_core3/u_exu/u_alu0/res_q_reg_63_ | cpu_clk | 0.011 |
+| func_ss_0p675v_125c_cworst_ccworst | 2 | u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_ | u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_ | npu_clk | 0.016 |
+| func_ss_0p675v_125c_cworst_ccworst | 3 | u_ddr_ss/u_mc2/u_sched/u_age_mtx/age_q_reg_12__5_ | u_ddr_ss/u_mc2/u_sched/cmd_sel_q_reg_3_ | mc_clk | 0.024 |
+| func_ss_0p675v_125c_cworst_ccworst | 4 | u_noc/u_rtr_1_3/u_vc_alloc/req_q_reg_17_ | u_noc/u_rtr_1_3/u_sw_alloc/grant_q_reg_4_ | core_clk | 0.029 |
+| func_ss_0p675v_125c_cworst_ccworst | 5 | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/data_q_reg_388_ | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_29_ | pcie_core_clk | 0.036 |
 | func_ss_0p675v_125c_rcworst | 1 | u_cpu/u_core3/u_exu/u_byp/src1_q_reg_41_ | u_cpu/u_core3/u_exu/u_alu0/res_q_reg_63_ | cpu_clk | 0.019 |
 | func_ss_0p675v_125c_rcworst | 2 | u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_ | u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_ | npu_clk | 0.024 |
 | func_ss_0p675v_125c_rcworst | 3 | u_ddr_ss/u_mc2/u_sched/u_age_mtx/age_q_reg_12__5_ | u_ddr_ss/u_mc2/u_sched/cmd_sel_q_reg_3_ | mc_clk | 0.030 |
 | func_ss_0p675v_125c_rcworst | 4 | u_noc/u_rtr_1_3/u_vc_alloc/req_q_reg_17_ | u_noc/u_rtr_1_3/u_sw_alloc/grant_q_reg_4_ | core_clk | 0.035 |
 | func_ss_0p675v_125c_rcworst | 5 | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/data_q_reg_388_ | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_29_ | pcie_core_clk | 0.040 |
-| func_ss_0p675v_m40c_cworst_ccworst | 1 | u_sec_encl/u_otp_if/otp_rdata_q_reg_37_ | u_sec_encl/u_keyldr/root_key_q_reg_37_ | sec_clk | -0.037 |
-| func_ss_0p675v_m40c_cworst_ccworst | 2 | u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_ | u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_ | npu_clk | 0.008 |
-| func_ss_0p675v_m40c_cworst_ccworst | 3 | u_cpu/u_core3/u_exu/u_byp/src1_q_reg_41_ | u_cpu/u_core3/u_exu/u_alu0/res_q_reg_63_ | cpu_clk | 0.013 |
-| func_ss_0p675v_m40c_cworst_ccworst | 4 | u_npu_c3/u_tile0/u_sfu/u_exp_lut/idx_q_reg_6_ | u_npu_c3/u_tile0/u_sfu/u_exp_lut/lut_out_q_reg_9_ | npu_clk | 0.021 |
-| func_ss_0p675v_m40c_cworst_ccworst | 5 | u_ddr_ss/u_mc2/u_sched/u_age_mtx/age_q_reg_12__5_ | u_ddr_ss/u_mc2/u_sched/cmd_sel_q_reg_3_ | mc_clk | 0.027 |
+| func_ss_0p675v_m40c_cworst_ccworst | 1 | u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_ | u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_ | npu_clk | 0.008 |
+| func_ss_0p675v_m40c_cworst_ccworst | 2 | u_cpu/u_core3/u_exu/u_byp/src1_q_reg_41_ | u_cpu/u_core3/u_exu/u_alu0/res_q_reg_63_ | cpu_clk | 0.013 |
+| func_ss_0p675v_m40c_cworst_ccworst | 3 | u_npu_c3/u_tile0/u_sfu/u_exp_lut/idx_q_reg_6_ | u_npu_c3/u_tile0/u_sfu/u_exp_lut/lut_out_q_reg_9_ | npu_clk | 0.021 |
+| func_ss_0p675v_m40c_cworst_ccworst | 4 | u_ddr_ss/u_mc2/u_sched/u_age_mtx/age_q_reg_12__5_ | u_ddr_ss/u_mc2/u_sched/cmd_sel_q_reg_3_ | mc_clk | 0.027 |
+| func_ss_0p675v_m40c_cworst_ccworst | 5 | u_noc/u_rtr_1_3/u_vc_alloc/req_q_reg_17_ | u_noc/u_rtr_1_3/u_sw_alloc/grant_q_reg_4_ | core_clk | 0.033 |
 | func_ss_0p675v_m40c_rcworst | 1 | u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_ | u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_ | npu_clk | 0.014 |
 | func_ss_0p675v_m40c_rcworst | 2 | u_cpu/u_core3/u_exu/u_byp/src1_q_reg_41_ | u_cpu/u_core3/u_exu/u_alu0/res_q_reg_63_ | cpu_clk | 0.019 |
 | func_ss_0p675v_m40c_rcworst | 3 | u_npu_c3/u_tile0/u_sfu/u_exp_lut/idx_q_reg_6_ | u_npu_c3/u_tile0/u_sfu/u_exp_lut/lut_out_q_reg_9_ | npu_clk | 0.028 |
@@ -202,7 +201,7 @@ Worst five endpoints per view (one path per endpoint).
 | func_ff_0p825v_m40c_cbest_ccbest | 2 | u_ddr_ss/u_mc1/u_dfi_if/dfi_rddata_en_q_reg_2_ | u_ddr_ss/u_phy1/DFI_RDDATA_EN_P2 (PHY macro pin) | mc_clk | 0.006 | - |
 | func_ff_0p825v_m40c_cbest_ccbest | 3 | u_pcie0_wrap/u_ctl/u_pipe_if/txdata_q_reg_207_ | u_pcie0_wrap/u_phy/PIPE_TX_DATA[207] (PHY macro pin) | pcie_core_clk | 0.009 | - |
 | func_ff_0p825v_m40c_cbest_ccbest | 4 | u_cpu/u_core2/u_lsu/u_stb/stb_vld_q_reg_6_ | u_cpu/u_core2/u_lsu/u_stb/fwd_hit_q_reg_6_ | cpu_clk | 0.011 | - |
-| func_ff_0p825v_m40c_cbest_ccbest | 5 | u_sec_encl/u_otp_if/otp_rdata_q_reg_37_ | u_sec_encl/u_keyldr/root_key_q_reg_37_ | sec_clk | 0.015 | post-ECO-B-003; W-017 withdrawn |
+| func_ff_0p825v_m40c_cbest_ccbest | 5 | u_sec_encl/u_otp_if/otp_rdata_q_reg_37_ | u_sec_encl/u_keyldr/root_key_q_reg_37_ | sec_clk | 0.013 | post-ECO-C-002 |
 | func_ff_0p825v_m40c_rcbest | 1 | u_ddr_ss/u_mc1/u_dfi_if/dfi_rddata_en_q_reg_2_ | u_ddr_ss/u_phy1/DFI_RDDATA_EN_P2 (PHY macro pin) | mc_clk | 0.006 | - |
 | func_ff_0p825v_m40c_rcbest | 2 | u_gbuf/u_bank13/u_arb/rd_addr_q_reg_5_ | u_gbuf/u_bank13/u_ram_hi/A[5] (SRAM macro pin) | core_clk | 0.008 | - |
 | func_ff_0p825v_m40c_rcbest | 3 | u_npu_c0/u_tile1/u_lsram_ctl/wr_mask_q_reg_31_ | u_npu_c0/u_tile1/u_lsram_b2/BWEB[31] (SRAM macro pin) | npu_clk | 0.009 | - |
@@ -235,32 +234,30 @@ Worst endpoint per clock group with 0.000 <= slack < 0.100 ns that is not alread
 
 | View | Clock group | Worst endpoint | Slack (ns) | Endpoints < 0.100 ns |
 |---|---|---|---|---|
-| func_ss_0p675v_m40c_cworst_ccworst | core_clk | u_noc/u_rtr_1_3/u_sw_alloc/grant_q_reg_4_ | 0.033 | 318 |
 | func_ss_0p675v_m40c_cworst_ccworst | npu_clk | u_npu_c2/u_tile1/u_mac_arr/u_pe_r9_c2/acc_q_reg_21_ | 0.036 | 1,412 |
 | func_ss_0p675v_m40c_cworst_ccworst | cpu_clk | u_cpu/u_core0/u_exu/u_alu1/res_q_reg_62_ | 0.038 | 624 |
+| func_ss_0p675v_m40c_cworst_ccworst | core_clk | u_noc/u_rtr_0_2/u_sw_alloc/grant_q_reg_1_ | 0.041 | 318 |
 | func_ss_0p675v_m40c_cworst_ccworst | mc_clk | u_ddr_ss/u_mc3/u_sched/cmd_sel_q_reg_1_ | 0.044 | 206 |
 | func_ss_0p675v_m40c_cworst_ccworst | pcie_core_clk | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_11_ | 0.052 | 141 |
-| func_ss_0p675v_m40c_cworst_ccworst | sec_clk | u_sec_encl/u_keyldr/root_key_q_reg_101_ | 0.069 | 6 |
-| func_ss_0p675v_125c_cworst_ccworst | pcie_core_clk | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_29_ | 0.036 | 118 |
+| func_ss_0p675v_m40c_cworst_ccworst | sec_clk | u_sec_encl/u_keyldr/root_key_q_reg_37_ | 0.064 | 7 |
 | func_ss_0p675v_125c_cworst_ccworst | cpu_clk | u_cpu/u_core0/u_exu/u_alu1/res_q_reg_62_ | 0.039 | 588 |
 | func_ss_0p675v_125c_cworst_ccworst | npu_clk | u_npu_c2/u_tile1/u_mac_arr/u_pe_r9_c2/acc_q_reg_21_ | 0.041 | 1,207 |
 | func_ss_0p675v_125c_cworst_ccworst | core_clk | u_noc/u_rtr_0_2/u_sw_alloc/grant_q_reg_1_ | 0.046 | 287 |
 | func_ss_0p675v_125c_cworst_ccworst | mc_clk | u_ddr_ss/u_mc3/u_sched/cmd_sel_q_reg_1_ | 0.048 | 193 |
-| func_ss_0p675v_125c_cworst_ccworst | sec_clk | u_sec_encl/u_keyldr/root_key_q_reg_101_ | 0.087 | 2 |
+| func_ss_0p675v_125c_cworst_ccworst | pcie_core_clk | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_11_ | 0.049 | 118 |
+| func_ss_0p675v_125c_cworst_ccworst | sec_clk | u_sec_encl/u_keyldr/root_key_q_reg_37_ | 0.082 | 3 |
 | func_ss_0p675v_m40c_rcworst | npu_clk | u_npu_c2/u_tile1/u_mac_arr/u_pe_r9_c2/acc_q_reg_21_ | 0.043 | 1,168 |
 | func_ss_0p675v_m40c_rcworst | cpu_clk | u_cpu/u_core0/u_exu/u_alu1/res_q_reg_62_ | 0.045 | 540 |
-| func_ss_0p675v_m40c_rcworst | sec_clk | u_sec_encl/u_keyldr/root_key_q_reg_37_ | 0.045 | 1 |
 | func_ss_0p675v_m40c_rcworst | core_clk | u_noc/u_rtr_0_2/u_sw_alloc/grant_q_reg_1_ | 0.049 | 262 |
 | func_ss_0p675v_m40c_rcworst | mc_clk | u_ddr_ss/u_mc3/u_sched/cmd_sel_q_reg_1_ | 0.052 | 171 |
 | func_ss_0p675v_m40c_rcworst | pcie_core_clk | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_11_ | 0.061 | 97 |
 | func_ss_0p675v_125c_rcworst | cpu_clk | u_cpu/u_core0/u_exu/u_alu1/res_q_reg_62_ | 0.046 | 497 |
-| func_ss_0p675v_125c_rcworst | sec_clk | u_sec_encl/u_keyldr/root_key_q_reg_37_ | 0.047 | 1 |
 | func_ss_0p675v_125c_rcworst | npu_clk | u_npu_c2/u_tile1/u_mac_arr/u_pe_r9_c2/acc_q_reg_21_ | 0.048 | 1,011 |
 | func_ss_0p675v_125c_rcworst | core_clk | u_noc/u_rtr_0_2/u_sw_alloc/grant_q_reg_1_ | 0.053 | 240 |
 | func_ss_0p675v_125c_rcworst | mc_clk | u_ddr_ss/u_mc3/u_sched/cmd_sel_q_reg_1_ | 0.055 | 158 |
 | func_ss_0p675v_125c_rcworst | pcie_core_clk | u_pcie0_wrap/u_ctl/u_tl_rx/u_ecrc/crc_q_reg_11_ | 0.057 | 88 |
 
-sec_clk: u_sec_encl/u_keyldr/root_key_q_reg_37_ is load-capacitance dominated (X1 drivers on two long shielded routes: otp_rdata_q[37] to u_secded and ecc_data[37] back to ecc_bypass_mux_37, which sits beside otp_rdata_q_reg_37_), so its cworst_ccworst to rcworst spread (0.082 ns at -40 C, 0.059 ns at 125 C) is larger than that of the paths above.
+sec_clk: u_sec_encl/u_keyldr/root_key_q_reg_37_ has 0.146 ns in func_ss_0p675v_m40c_rcworst and 0.141 ns in func_ss_0p675v_125c_rcworst, so it is not listed in the rcworst rows. The path is load-capacitance dominated (X1 drivers on two long shielded routes: otp_rdata_q[37] to u_secded and ecc_data[37] back to ecc_bypass_mux_37, which sits beside otp_rdata_q_reg_37_), so its cworst_ccworst to rcworst spread is larger than that of the paths above.
 
 ## 9. Test-mode timing
 
@@ -310,7 +307,7 @@ These are functional D-pin paths. In scan_shift SE=1 selects SI, so the D path i
 
 ## 11. Waivers applied in this report
 
-23 of the 24 entries in KST-STA-021 rev B are applied to the results above.
+23 of the 24 entries in KST-STA-021 rev C are applied to the results above.
 
 | Category | Waiver(s) | View(s) | Scope |
 |---|---|---|---|
@@ -320,15 +317,15 @@ These are functional D-pin paths. In scan_shift SE=1 selects SI, so the D path i
 | Test mode: multicycle exceptions | W-007, W-008, W-018, W-019, W-021 | scan_capture_ss / mbist_ss | explicit from-lists |
 | Test mode: clock-gating checks on OCC/MBIST enables | W-005, W-006, W-014 | scan_shift_ss / scan_capture_ss / mbist_ss | 44 enables |
 | Test mode: minimum pulse width on PHY macro test pins | W-003, W-013 | scan_capture_ss_0p675v_125c_cworst_ccworst | 5 pins |
-| Withdrawn (not applied) | W-017 (Withdrawn, ECO-B-003) | - | - |
+| Withdrawn (not applied) | W-017 (Withdrawn - ECO-B-003, superseded by ECO-C-002) | - | - |
 
 ## 12. Sign-off
 
 | Role | Name | Decision | Date |
 |---|---|---|---|
-| STA Lead (owner) | Mei-Lin Chou | GREEN | 2026-09-02 |
-| STA Engineer (SEC/PMU partitions) | Jonah Pike | Prepared | 2026-09-02 |
-| PD Lead (reviewer) | Daniel Achterberg | Reviewed | 2026-09-02 |
+| STA Lead (owner) | Mei-Lin Chou | GREEN | 2026-09-23 |
+| STA Engineer (SEC/PMU partitions) | Jonah Pike | Prepared | 2026-09-23 |
+| PD Lead (reviewer) | Daniel Achterberg | Reviewed | 2026-09-23 |
 
 ## Appendix A. Path reports
 
@@ -336,45 +333,35 @@ Condensed path reports from the sign-off run. Times in ns; r/f = rise/fall at th
 
 ### A.1 Worst functional setup path
 
-View func_ss_0p675v_m40c_cworst_ccworst; startpoint u_sec_encl/u_otp_if/otp_rdata_q_reg_37_; endpoint u_sec_encl/u_keyldr/root_key_q_reg_37_; clock sec_clk (period 2.000 ns); path group reg2reg; max path through the SECDED check/correct logic u_sec_encl/u_keyldr/u_secded; Vt mix SVT only (u_sec_encl). Incr values include SI delta delay and POCV (3.0 sigma).
+View func_ss_0p675v_m40c_cworst_ccworst; startpoint u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_; endpoint u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_; clock npu_clk (period 0.833 ns); path group reg2reg; Vt mix LVT/ULVT. Incr values include SI delta delay and POCV (3.0 sigma).
 
 | Point | Cell | Incr (ns) | Path (ns) |
 |---|---|---|---|
-| clock sec_clk (rise edge) |  | 0.000 | 0.000 |
-| clock network delay (propagated) |  | 0.812 | 0.812 |
-| u_sec_encl/u_otp_if/otp_rdata_q_reg_37_/CP | DFFRQ_X1 | 0.000 | 0.812 r |
-| u_sec_encl/u_otp_if/otp_rdata_q_reg_37_/Q | DFFRQ_X1 | 0.121 | 0.933 r |
-| u_sec_encl/u_keyldr/u_secded/in_qual_37/A1 (net otp_rdata_q[37], shielded route) | AND2_X1 | 0.072 | 1.005 r |
-| u_sec_encl/u_keyldr/u_secded/in_qual_37/Z | AND2_X1 | 0.081 | 1.086 r |
-| u_sec_encl/u_keyldr/u_secded/in_fo_buf_37/Z | BUF_X2 | 0.078 | 1.164 r |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l1_18/Z | XOR2_X1 | 0.104 | 1.268 f |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l2_9/Z | XOR2_X1 | 0.108 | 1.376 r |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l3_4/Z | XOR2_X1 | 0.102 | 1.478 f |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l4_2/Z | XOR2_X1 | 0.109 | 1.587 r |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l5_1/Z | XOR2_X1 | 0.106 | 1.693 f |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l6_0/Z | XOR2_X2 | 0.094 | 1.787 r |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_l7_0/Z | XOR2_X2 | 0.091 | 1.878 f |
-| u_sec_encl/u_keyldr/u_secded/syn_x3_chk/Z | XOR2_X2 | 0.093 | 1.971 r |
-| u_sec_encl/u_keyldr/u_secded/syn_s3_buf_0/Z | BUF_X4 | 0.069 | 2.040 r |
-| u_sec_encl/u_keyldr/u_secded/syn_s3_buf_4/Z | BUF_X2 | 0.117 | 2.157 r |
-| u_sec_encl/u_keyldr/u_secded/dec_37_nd3b/ZN | NAND3_X1 | 0.096 | 2.253 f |
-| u_sec_encl/u_keyldr/u_secded/dec_37_nr3/ZN | NOR3_X1 | 0.131 | 2.384 r |
-| u_sec_encl/u_keyldr/u_secded/corr_xor_37/Z | XOR2_X1 | 0.112 | 2.496 f |
-| u_sec_encl/u_keyldr/u_secded/ded_gate_37/Z | AND2_X1 | 0.084 | 2.580 f |
-| u_sec_encl/u_keyldr/ecc_bypass_mux_37/I0 (net ecc_data[37], shielded route) | MUX2_X1 | 0.139 | 2.719 f |
-| u_sec_encl/u_keyldr/ecc_bypass_mux_37/Z | MUX2_X1 | 0.094 | 2.813 f |
-| u_sec_encl/u_keyldr/eco_b003_dly_0/Z | DLY2_X1 | 0.050 | 2.863 f |
-| u_sec_encl/u_keyldr/eco_b003_dly_1/Z | DLY2_X1 | 0.051 | 2.914 f |
-| u_sec_encl/u_keyldr/root_key_q_reg_37_/D | DFFRQ_X1 | 0.004 | 2.918 f |
-| **data arrival time** |  |  | **2.918** |
-| clock sec_clk (rise edge) |  | 2.000 | 2.000 |
-| clock network delay (propagated) |  | 0.959 | 2.959 |
-| clock reconvergence pessimism |  | 0.021 | 2.980 |
-| clock uncertainty |  | -0.050 | 2.930 |
-| u_sec_encl/u_keyldr/root_key_q_reg_37_/CP | DFFRQ_X1 |  | 2.930 r |
-| library setup time |  | -0.049 | 2.881 |
-| **data required time** |  |  | **2.881** |
-| **slack (VIOLATED)** |  |  | **-0.037** |
+| clock npu_clk (rise edge) |  | 0.000 | 0.000 |
+| clock network delay (propagated) |  | 1.118 | 1.118 |
+| u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_/CP | SDFFQ_X1 | 0.000 | 1.118 r |
+| u_npu_c1/u_tile2/u_wbuf/rd_data_q_reg_411_/Q | SDFFQ_X1 | 0.082 | 1.200 f |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_mul/pp_gen_3/ZN | AOI22_X1 | 0.061 | 1.261 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_mul/csa_l1_7/S | FA_X1 | 0.093 | 1.354 f |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_mul/csa_l2_4/S | FA_X1 | 0.091 | 1.445 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_mul/csa_l3_2/CO | FA_X1 | 0.078 | 1.523 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_add/pg_l1_11/Z | AO21_X1 | 0.052 | 1.575 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_add/pg_l2_11/Z | AO21_X1 | 0.049 | 1.624 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_add/pg_l3_11/Z | AO21_X2 | 0.047 | 1.671 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_add/pg_l4_19/Z | AO21_X2 | 0.051 | 1.722 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_add/pg_l5_23/Z | AO21_X1 | 0.054 | 1.776 r |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/u_add/sum_xor_23/Z | XOR2_X1 | 0.058 | 1.834 f |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_sat_mux_23/Z | MUX2_X1 | 0.051 | 1.885 f |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_/D | SDFFQ_X1 | 0.017 | 1.902 f |
+| **data arrival time** |  |  | **1.902** |
+| clock npu_clk (rise edge) |  | 0.833 | 0.833 |
+| clock network delay (propagated) |  | 1.131 | 1.964 |
+| clock reconvergence pessimism |  | 0.024 | 1.988 |
+| clock uncertainty |  | -0.050 | 1.938 |
+| u_npu_c1/u_tile2/u_mac_arr/u_pe_r12_c7/acc_q_reg_23_/CP | SDFFQ_X1 |  | 1.938 r |
+| library setup time |  | -0.028 | 1.910 |
+| **data required time** |  |  | **1.910** |
+| **slack** |  |  | **0.008** |
 
 
 ### A.2 Worst functional hold path
@@ -426,15 +413,23 @@ View scan_shift_ss_0p675v_m40c_cworst_ccworst; startpoint u_npu_c2/u_dbg_tap/tra
 | **slack (VIOLATED, waived W-004)** |  |  | **-0.138** |
 
 
-### A.4 ECO-B-003 timing (incremental run sta_kst_0828_b003_inc, 2026-08-28, hold views)
+### A.4 ECO-C-002 verification (full run sta_kst_0922_full)
 
-| Endpoint | View | Check | Rev A slack (ns) | Post-ECO-B-003 slack (ns) | Run |
+Endpoint u_sec_encl/u_keyldr/root_key_q_reg_37_ across the ECO sequence (slack in ns).
+
+| Endpoint | View | Check | Rev A | Rev B (ECO-B-003) | Rev C (ECO-C-002) |
 |---|---|---|---|---|---|
-| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ff_0p825v_m40c_cbest_ccbest | hold | -0.021 | 0.015 | sta_kst_0828_b003_inc |
-| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ff_0p825v_m40c_rcbest | hold | 0.012 | 0.048 | sta_kst_0828_b003_inc |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ss_0p675v_m40c_cworst_ccworst | setup | 0.064 | -0.037 (rev B, superseded) | 0.064 |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ss_0p675v_125c_cworst_ccworst | setup | 0.082 | -0.012 (rev B, superseded) | 0.082 |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ss_0p675v_m40c_rcworst | setup | 0.146 | 0.045 | 0.146 |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ss_0p675v_125c_rcworst | setup | 0.141 | 0.047 | 0.141 |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ff_0p825v_m40c_cbest_ccbest | hold | -0.021 (rev A) | 0.015 | 0.013 |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_ | func_ff_0p825v_m40c_rcbest | hold | 0.012 | 0.048 | 0.046 |
+
+The max path through u_sec_encl/u_keyldr/u_secded is identical to rev A; the delay is now on the ECC-bypass branch only.
 
 
-#### A.4.1 Post-ECO-B-003 hold path (from full run sta_kst_0902_full)
+#### A.4.1 Post-ECO-C-002 hold path
 
 View func_ff_0p825v_m40c_cbest_ccbest; startpoint u_sec_encl/u_otp_if/otp_rdata_q_reg_37_; endpoint u_sec_encl/u_keyldr/root_key_q_reg_37_; clock sec_clk (period 2.000 ns); path group reg2reg; min path through the ECC-bypass branch u_sec_encl/u_keyldr/ecc_bypass_mux_37/I1; Vt mix SVT only (u_sec_encl).
 
@@ -444,12 +439,12 @@ View func_ff_0p825v_m40c_cbest_ccbest; startpoint u_sec_encl/u_otp_if/otp_rdata_
 | clock network delay (propagated) |  | 0.291 | 0.291 |
 | u_sec_encl/u_otp_if/otp_rdata_q_reg_37_/CP | DFFRQ_X1 | 0.000 | 0.291 r |
 | u_sec_encl/u_otp_if/otp_rdata_q_reg_37_/Q | DFFRQ_X1 | 0.036 | 0.327 f |
-| u_sec_encl/u_keyldr/ecc_bypass_mux_37/I1 | MUX2_X1 | 0.002 | 0.329 f |
-| u_sec_encl/u_keyldr/ecc_bypass_mux_37/Z | MUX2_X1 | 0.023 | 0.352 f |
-| u_sec_encl/u_keyldr/eco_b003_dly_0/Z | DLY2_X1 | 0.018 | 0.370 f |
-| u_sec_encl/u_keyldr/eco_b003_dly_1/Z | DLY2_X1 | 0.018 | 0.388 f |
-| u_sec_encl/u_keyldr/root_key_q_reg_37_/D | DFFRQ_X1 | 0.001 | 0.389 f |
-| **data arrival time** |  |  | **0.389** |
+| u_sec_encl/u_keyldr/eco_c002_dly_0/I | DLY4_X1 | 0.002 | 0.329 f |
+| u_sec_encl/u_keyldr/eco_c002_dly_0/Z | DLY4_X1 | 0.032 | 0.361 f |
+| u_sec_encl/u_keyldr/ecc_bypass_mux_37/I1 | MUX2_X1 | 0.002 | 0.363 f |
+| u_sec_encl/u_keyldr/ecc_bypass_mux_37/Z | MUX2_X1 | 0.023 | 0.386 f |
+| u_sec_encl/u_keyldr/root_key_q_reg_37_/D | DFFRQ_X1 | 0.001 | 0.387 f |
+| **data arrival time** |  |  | **0.387** |
 | clock sec_clk (rise edge) |  | 0.000 | 0.000 |
 | clock network delay (propagated) |  | 0.342 | 0.342 |
 | clock reconvergence pessimism |  | -0.007 | 0.335 |
@@ -457,4 +452,4 @@ View func_ff_0p825v_m40c_cbest_ccbest; startpoint u_sec_encl/u_otp_if/otp_rdata_
 | u_sec_encl/u_keyldr/root_key_q_reg_37_/CP | DFFRQ_X1 |  | 0.355 r |
 | library hold time |  | 0.019 | 0.374 |
 | **data required time** |  |  | **0.374** |
-| **slack** |  |  | **0.015** |
+| **slack** |  |  | **0.013** |
