@@ -655,7 +655,7 @@ def cmd_review(a, gh: GH) -> int:
     result = {"pr": a.pr, "sha": sha, "round": round_no, "rev_label": rev_label, "letter": letter,
               "session": skey, "gate_wall_s": round(gate_wall, 1), "stats": stats, "grounding": g,
               "correction": correction, "schedule": sched, "plain": plain, "io_summary": io_text, "io_source": io_src,
-              "report": {k: val for k, val in rep.items()}}
+              "report": json.loads(json.dumps(rep))}
     for f in result["report"].get("findings") or []:
         f.pop("_checks", None)
     (out / "report.json").write_text(json.dumps(result, indent=1))
@@ -693,6 +693,16 @@ def publish(gh: GH, pr_no: int, sha: str, round_no: int, letter: str, rep: dict,
         log(f"  could not list review threads: {e}")
 
     prev = state["findings"]
+    # The gate reuses finding ids across rounds; if it renamed one it still calls still_open, map it back by rule.
+    used = {f["id"] for f in findings if f["id"] in prev}
+    for f in findings:
+        if f["id"] not in prev and f.get("status") == "still_open":
+            for pid, pv in prev.items():
+                if pid not in used and set(pv.get("rule_ids") or []) & set(f.get("rule_ids") or []):
+                    log(f"  mapping renamed finding {f['id']} -> {pid}")
+                    f["id"] = pid
+                    used.add(pid)
+                    break
     cur_ids = {f["id"] for f in findings}
     closed_rows = []
     closed_by_gate = {c.get("id"): c for c in rep.get("closed_since_previous") or []}
