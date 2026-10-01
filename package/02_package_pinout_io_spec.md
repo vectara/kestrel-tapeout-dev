@@ -4,20 +4,22 @@
 |---|---|
 | Doc ID | KST-PKG-002 |
 | Title | Package, Pinout & I/O Specification |
-| Revision | A |
-| Date | 2026-08-11 |
+| Revision | B (supersedes A) |
+| Date | 2026-09-01 |
 | Owner | Rachel Lindqvist (Package & I/O Lead) |
-| Status | Released for TRR-1 |
+| Status | Released for TRR-2 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
-Applicable tape-out package: **A** (TRR-1, 2026-08-14). Netlist `kst_top_nl_2026.08.07`; pad-ring database release PR-14 (frozen 2026-08-07); substrate design SUB-R07; ball-map source file `kst_ballmap_revA.csv`.
+Applicable tape-out package: **B** (TRR-2, 2026-09-04). Netlist `kst_top_nl_2026.08.31`; pad-ring database release PR-15 (CHG-B-001, CHG-B-002); substrate design SUB-R07 (unchanged); ball-map source file `kst_ballmap_revB.csv`.
 
 ## Revision history
 
 | Rev | Date | Author | Description |
 |---|---|---|---|
 | A | 2026-08-11 | Rachel Lindqvist | Initial controlled release for TRR-1. Supersedes working draft 0.8 (2026-07-22). |
+| B | 2026-09-01 | Rachel Lindqvist | CHG-B-001: NC balls AR44, AT44, AU44, AV44, AW44, AY44 re-labelled TP_0..TP_5 (documentation only). |
+| B | 2026-09-01 | Rachel Lindqvist | CHG-B-002: GPIO_B I/O cells changed from IO_GPIO_1V2 to IO_GPIO_1V8 and VDDIO_B from 1.2 V to 1.8 V to match KST-ARCH-001 (1.8 V QSPI0 boot flash and SPI1 sensor); 16 pad-ring cells swapped; ball map unchanged. |
 
 ## 1. Scope and references
 
@@ -28,7 +30,7 @@ This specification defines the ALX-5100 package, the ball assignment, the compos
 | KST-ARCH-001 | Architecture Specification: interface signal list, SKUs, rails, power sequencing |
 | KST-IPBOM-050 | IP Bill of Materials: GPIO-N5-LIB, PCIE5-PHY-N5, PHY-LP5X-N5 releases |
 | KST-PI-040 | Power Integrity Sign-off Report: package model and power-ball allocation used for IR/EM |
-| KST-RC1-SCH | Reference card (CEM x16, 150 W, one 2x3 6-pin aux) schematic, rev P1 |
+| KST-RC1-SCH | Reference card (CEM x16, 150 W, one 2x3 6-pin aux) schematic, rev P2 (VDDIO_1V8_B rail) |
 | SUB-R07 | Package substrate design database |
 | ALD-QA-CHK-007 rev 7.2 | Tape-out Readiness Checklist |
 
@@ -62,8 +64,8 @@ All cells are from the GPIO-N5-LIB library (release per KST-IPBOM-050).
 
 | Cell | Description | Operating VDDIO | Max VDDIO | Abs. max pad voltage | Drive strengths | Instances |
 |---|---|---|---|---|---|---|
-| IO_GPIO_1V2 | 1.2 V-only GPIO, 1.2 V I/O devices | 1.2 V | 1.32 V | VDDIO + 0.3 V (1.50 V at 1.2 V) | 2/4/8/12 mA | 32 |
-| IO_GPIO_1V8 | 1.8 V/1.2 V dual-voltage GPIO, 1.8 V overdrive I/O devices | 1.8 V or 1.2 V | 1.98 V | VDDIO + 0.3 V (2.10 V at 1.8 V) | 2/4/8/12/16 mA | 20 |
+| IO_GPIO_1V2 | 1.2 V-only GPIO, 1.2 V I/O devices | 1.2 V | 1.32 V | VDDIO + 0.3 V (1.50 V at 1.2 V) | 2/4/8/12 mA | 16 |
+| IO_GPIO_1V8 | 1.8 V/1.2 V dual-voltage GPIO, 1.8 V overdrive I/O devices | 1.8 V or 1.2 V | 1.98 V | VDDIO + 0.3 V (2.10 V at 1.8 V) | 2/4/8/12/16 mA | 36 |
 | IO_IN_1V8_ST | Input-only Schmitt-trigger cell, 1.8 V overdrive devices | 1.8 V | 1.98 V | VDDIO + 0.3 V (2.10 V) | - | 2 |
 | IO_XTAL_1V8 | Pierce crystal-oscillator cell, 25 MHz | 1.8 V | 1.98 V | VDDIO + 0.3 V (2.10 V) | - | 2 |
 | IO_ANA | Analog pass-through with secondary ESD | - | - | 2.10 V | - | 3 |
@@ -89,7 +91,7 @@ IO_GPIO_1V8 has a static supply-select pin V18 that is tied per bank (1 = 1.8 V 
 | Bank | Pins | I/O cell | VDDIO | Supply | V18 tie | Segment | Functions |
 |---|---|---|---|---|---|---|---|
 | GPIO_A | 12 | IO_GPIO_1V8 | 1.8 V | VDDIO_A | 1 | E2 | JTAG, UART0, boot/debug straps, 2 spare; scan channels in TEST_MODE |
-| GPIO_B | 16 | IO_GPIO_1V2 | 1.2 V | VDDIO_B | n/a | E3 | QSPI0 boot flash, SPI1 telemetry sensor, SENSOR_ALERT_N, 4 spare |
+| GPIO_B | 16 | IO_GPIO_1V8 | 1.8 V | VDDIO_B | 1 | E3 | QSPI0 boot flash, SPI1 telemetry sensor, SENSOR_ALERT_N, 4 spare (CHG-B-002) |
 | GPIO_C | 16 | IO_GPIO_1V2 | 1.2 V | VDDIO_C | n/a | E4 | Card-management CPLD, LEDs, PWR_GOOD inputs, THERMTRIP_N, PROCHOT_N |
 | GPIO_D | 8 | IO_GPIO_1V8 | 1.8 V | VDDIO_D | 1 | E5 | I2C0/I2C1 (SMBus), PCIE0_PERST_N, PCIE0_CLKREQ_N, PCIE0_WAKE_N, SMB_ALERT_N |
 
@@ -106,7 +108,7 @@ IO_GPIO_1V8 has a static supply-select pin V18 that is tied per bank (1 = 1.8 V 
 | VDD_SRAM | 0.800 V | 64 | VR_SRAM | SRAM arrays |
 | VDD_AON | 0.750 V | 8 | LDO_AON | Always-on domain |
 | VDDIO_A | 1.8 V | 3 | VDDIO_1V8 | GPIO_A bank supply; XTAL, PORST_N, TEST_MODE |
-| VDDIO_B | 1.2 V | 4 | VDDIO_1V2 (shared with VDDIO_C) | GPIO_B bank supply |
+| VDDIO_B | 1.8 V | 4 | VDDIO_1V8_B (dedicated) | GPIO_B bank supply (CHG-B-002) |
 | VDDIO_C | 1.2 V | 4 | VDDIO_1V2 | GPIO_C bank supply |
 | VDDIO_D | 1.8 V | 2 | VDDIO_1V8 | GPIO_D bank supply |
 | VDDA_PCIE_0V75 | 0.75 V | 24 | LDO_PCIE_0V75 | PCIE0 and PCIE1 PHY analog |
@@ -129,7 +131,7 @@ IO_GPIO_1V8 has a static supply-select pin V18 that is tied per bank (1 = 1.8 V 
 | **Signal subtotal** | **761** |
 | Power (14 supplies, section 5.1) | 734 |
 | VSS | 803 |
-| NC: AR44, AT44, AU44, AV44, AW44, AY44 | 6 |
+| Reserved test pads TP_0..TP_5: AR44, AT44, AU44, AV44, AW44, AY44 (CHG-B-001) | 6 |
 | **Total** | **2,304** |
 
 ### 5.3 Power and ground balls by region
@@ -151,7 +153,7 @@ IO_GPIO_1V8 has a static supply-select pin V18 that is tied per bank (1 = 1.8 V 
 | VDDA_PLL_0V75 | 4 | 0 | 0 | 0 | 0 | 4 |
 | VPP_OTP | 0 | 0 | 0 | 0 | 1 | 1 |
 | VSS | 399 | 150 | 134 | 70 | 50 | 803 |
-| Signal / NC balls | 0 | 300 | 300 | 67 | 100 | 767 |
+| Signal / TP balls | 0 | 300 | 300 | 67 | 100 | 767 |
 | **Region total** | 961 | 504 | 488 | 167 | 184 | **2,304** |
 
 Regions in this table are substrate power-plane quadrants; they differ from the signal-region boundaries in section 7.2. Ball current capacity is 0.35 A per ball at Tj = 105 C. Worst case is VDD_NPU at 0.21 A per ball at TDP.
@@ -176,7 +178,7 @@ Regions in this table are substrate power-plane quadrants; they differ from the 
 | E1 | Dedicated | 2 x IO_XTAL_1V8, 2 x IO_IN_1V8_ST, 3 x IO_ANA | VDDIO_A | XTAL_IN/OUT, PORST_N, TEST_MODE; THERM_DP/DN, ATB0 |
 | E2 | GPIO_A | 12 x IO_GPIO_1V8, 3 x IO_PVDDIO_DV, 4 x IO_PVSS, 1 x IO_POC_DV | VDDIO_A | V18 = 1 |
 | - | Breaker | 1 x IO_BRK_DV | - | VDDIO_A / VDDIO_B split |
-| E3 | GPIO_B | 16 x IO_GPIO_1V2, 4 x IO_PVDDIO_DV, 4 x IO_PVSS, 1 x IO_POC_DV | VDDIO_B | |
+| E3 | GPIO_B | 16 x IO_GPIO_1V8, 4 x IO_PVDDIO_DV, 4 x IO_PVSS, 1 x IO_POC_DV | VDDIO_B | V18 = 1 (CHG-B-002) |
 | - | Breaker | 1 x IO_BRK_DV | - | VDDIO_B / VDDIO_C split |
 | E4 | GPIO_C | 16 x IO_GPIO_1V2, 4 x IO_PVDDIO_DV, 4 x IO_PVSS, 1 x IO_POC_DV | VDDIO_C | |
 | - | Breaker | 1 x IO_BRK_DV | - | VDDIO_C / VDDIO_D split |
@@ -197,7 +199,7 @@ Viewed from the top (lid side), ball A1 is the top-left corner (marked on the li
 | North | A..N | 13..42 | MEM2 (columns 13..27) and MEM3 (columns 28..42) LPDDR5X signals, VDDQ_LPX_0V5, VDDA_LPX_0V75, VSS |
 | North-east | A..D | 43..44 (and A45..A47, C45) | XTAL_IN, XTAL_OUT, PORST_N, TEST_MODE (row A), THERM_DP/DN, ATB0 (C44, C45, D44), VSS |
 | East, upper | B..AG | 45..48 | GPIO_A..GPIO_D, VDDIO_A..VDDIO_D, VDD_AON, VPP_OTP, VSS |
-| East, lower | AH..BC | 44..48 | PCIE1 lanes, REFCLK, RESREF, VDDA_PCIE_*, VSS; column 44 rows AR..AY unassigned (section 7.12) |
+| East, lower | AH..BC | 44..48 | PCIE1 lanes, REFCLK, RESREF, VDDA_PCIE_*, VSS; column 44 rows AR..AY reserved test pads TP_0..TP_5 (section 7.12) |
 | South | BC..BH | 2..37 | PCIE0 lanes, REFCLK, RESREF, VDDA_PCIE_0V75, VDDA_PCIE_1V2, VSS |
 | Center | P..BB | 13..43 | Core power array: VDD_CORE, VDD_NPU, VDD_SRAM, VDD_AON, VDDA_PLL_0V75, VSS |
 
@@ -224,22 +226,22 @@ GPIO_A supply balls: B46, D46, F46.
 
 | Ball | Pin / function | Bank | I/O cell | Drive | Pull | Dir | Notes |
 |---|---|---|---|---|---|---|---|
-| J48 | GPIO_B0 / QSPI0_CLK | GPIO_B | IO_GPIO_1V2 | 8 mA | none | O | Boot flash clock, 133 MHz SDR; 22 ohm series R on card |
-| J47 | GPIO_B1 / QSPI0_CS0_N | GPIO_B | IO_GPIO_1V2 | 4 mA | PU | O |  |
-| K48 | GPIO_B2 / QSPI0_DQ0 | GPIO_B | IO_GPIO_1V2 | 8 mA | none | I/O |  |
-| K47 | GPIO_B3 / QSPI0_DQ1 | GPIO_B | IO_GPIO_1V2 | 8 mA | none | I/O |  |
-| L48 | GPIO_B4 / QSPI0_DQ2 | GPIO_B | IO_GPIO_1V2 | 8 mA | PU | I/O | WP_N in single-SPI mode |
-| L47 | GPIO_B5 / QSPI0_DQ3 | GPIO_B | IO_GPIO_1V2 | 8 mA | PU | I/O | HOLD_N in single-SPI mode |
-| M48 | GPIO_B6 / QSPI0_RST_N | GPIO_B | IO_GPIO_1V2 | 4 mA | PD | O | Released by boot ROM |
-| M47 | GPIO_B7 / SPI1_SCLK | GPIO_B | IO_GPIO_1V2 | 4 mA | none | O | Telemetry sensor, 20 MHz |
-| N48 | GPIO_B8 / SPI1_CS0_N | GPIO_B | IO_GPIO_1V2 | 4 mA | PU | O |  |
-| N47 | GPIO_B9 / SPI1_MOSI | GPIO_B | IO_GPIO_1V2 | 4 mA | none | O |  |
-| P48 | GPIO_B10 / SPI1_MISO | GPIO_B | IO_GPIO_1V2 | - | PD | I |  |
-| P47 | GPIO_B11 / SENSOR_ALERT_N | GPIO_B | IO_GPIO_1V2 | - | PU | I | Wake-capable |
-| R48 | GPIO_B12 | GPIO_B | IO_GPIO_1V2 | 4 mA | PD | I/O | Spare |
-| R47 | GPIO_B13 | GPIO_B | IO_GPIO_1V2 | 4 mA | PD | I/O | Spare |
-| T48 | GPIO_B14 | GPIO_B | IO_GPIO_1V2 | 4 mA | PD | I/O | Spare |
-| T47 | GPIO_B15 | GPIO_B | IO_GPIO_1V2 | 4 mA | PD | I/O | Spare |
+| J48 | GPIO_B0 / QSPI0_CLK | GPIO_B | IO_GPIO_1V8 | 8 mA | none | O | Boot flash clock, 133 MHz SDR; 22 ohm series R on card |
+| J47 | GPIO_B1 / QSPI0_CS0_N | GPIO_B | IO_GPIO_1V8 | 4 mA | PU | O |  |
+| K48 | GPIO_B2 / QSPI0_DQ0 | GPIO_B | IO_GPIO_1V8 | 8 mA | none | I/O |  |
+| K47 | GPIO_B3 / QSPI0_DQ1 | GPIO_B | IO_GPIO_1V8 | 8 mA | none | I/O |  |
+| L48 | GPIO_B4 / QSPI0_DQ2 | GPIO_B | IO_GPIO_1V8 | 8 mA | PU | I/O | WP_N in single-SPI mode |
+| L47 | GPIO_B5 / QSPI0_DQ3 | GPIO_B | IO_GPIO_1V8 | 8 mA | PU | I/O | HOLD_N in single-SPI mode |
+| M48 | GPIO_B6 / QSPI0_RST_N | GPIO_B | IO_GPIO_1V8 | 4 mA | PD | O | Released by boot ROM |
+| M47 | GPIO_B7 / SPI1_SCLK | GPIO_B | IO_GPIO_1V8 | 4 mA | none | O | Telemetry sensor, 20 MHz |
+| N48 | GPIO_B8 / SPI1_CS0_N | GPIO_B | IO_GPIO_1V8 | 4 mA | PU | O |  |
+| N47 | GPIO_B9 / SPI1_MOSI | GPIO_B | IO_GPIO_1V8 | 4 mA | none | O |  |
+| P48 | GPIO_B10 / SPI1_MISO | GPIO_B | IO_GPIO_1V8 | - | PD | I |  |
+| P47 | GPIO_B11 / SENSOR_ALERT_N | GPIO_B | IO_GPIO_1V8 | - | PU | I | Wake-capable |
+| R48 | GPIO_B12 | GPIO_B | IO_GPIO_1V8 | 4 mA | PD | I/O | Spare |
+| R47 | GPIO_B13 | GPIO_B | IO_GPIO_1V8 | 4 mA | PD | I/O | Spare |
+| T48 | GPIO_B14 | GPIO_B | IO_GPIO_1V8 | 4 mA | PD | I/O | Spare |
+| T47 | GPIO_B15 | GPIO_B | IO_GPIO_1V8 | 4 mA | PD | I/O | Spare |
 
 GPIO_B supply balls: J46, L46, N46, R46.
 
@@ -383,16 +385,16 @@ Each byte lane carries DQ[7:0], DMI, RDQS_T/RDQS_C and WCK_T/WCK_C (13 balls). S
 
 Total LPDDR5X signal balls: 32 x 13 + 4 x 46 = 600.
 
-### 7.12 Unassigned balls
+### 7.12 Reserved test pads
 
 | Ball | Name | Notes |
 |---|---|---|
-| AR44 | NC | No die connection; shorted in pairs in the substrate (SUB-R07) for ATE socket continuity check; column 44 keep-out next to the PCIE1 RX pairs |
-| AT44 | NC | No die connection; shorted in pairs in the substrate (SUB-R07) for ATE socket continuity check; column 44 keep-out next to the PCIE1 RX pairs |
-| AU44 | NC | No die connection; shorted in pairs in the substrate (SUB-R07) for ATE socket continuity check; column 44 keep-out next to the PCIE1 RX pairs |
-| AV44 | NC | No die connection; shorted in pairs in the substrate (SUB-R07) for ATE socket continuity check; column 44 keep-out next to the PCIE1 RX pairs |
-| AW44 | NC | No die connection; shorted in pairs in the substrate (SUB-R07) for ATE socket continuity check; column 44 keep-out next to the PCIE1 RX pairs |
-| AY44 | NC | No die connection; shorted in pairs in the substrate (SUB-R07) for ATE socket continuity check; column 44 keep-out next to the PCIE1 RX pairs |
+| AR44 | TP_0 | Reserved test pad, shorted in pairs in the substrate for ATE socket continuity check; no die connection; leave unconnected on boards (CHG-B-001) |
+| AT44 | TP_1 | Reserved test pad, shorted in pairs in the substrate for ATE socket continuity check; no die connection; leave unconnected on boards (CHG-B-001) |
+| AU44 | TP_2 | Reserved test pad, shorted in pairs in the substrate for ATE socket continuity check; no die connection; leave unconnected on boards (CHG-B-001) |
+| AV44 | TP_3 | Reserved test pad, shorted in pairs in the substrate for ATE socket continuity check; no die connection; leave unconnected on boards (CHG-B-001) |
+| AW44 | TP_4 | Reserved test pad, shorted in pairs in the substrate for ATE socket continuity check; no die connection; leave unconnected on boards (CHG-B-001) |
+| AY44 | TP_5 | Reserved test pad, shorted in pairs in the substrate for ATE socket continuity check; no die connection; leave unconnected on boards (CHG-B-001) |
 
 ## 8. Reference-card design notes
 
@@ -410,15 +412,15 @@ Total LPDDR5X signal balls: 32 x 13 + 4 x 46 = 600.
 
 | Check | Result | Date | By |
 |---|---|---|---|
-| Ball map vs. KST-ARCH-001 interface signal list (CHK-SPEC-02) | PASS: 761/761 signal balls assigned; 0 unassigned interface signals; 6 NC balls (section 7.12) excluded | 2026-08-11 | Rachel Lindqvist |
-| Ball map vs. top-level ports of kst_top_nl_2026.08.07 | PASS: 761 ports matched | 2026-08-10 | Rachel Lindqvist |
-| I/O cell max VDDIO >= bank VDDIO (section 3.1 vs section 4) | PASS (4/4 banks) | 2026-08-10 | Rachel Lindqvist |
-| Pad-ring LVS / ERC, GPIO segment incl. ring breakers | PASS, 0 errors | 2026-08-09 | Daniel Achterberg |
-| ESD network check (HBM 1 kV, CDM 250 V), per GPIO bank and all PHY hard-macro pads | PASS | 2026-08-09 | Rachel Lindqvist |
-| Bump-to-ball netlist (package / die co-design) | PASS, 0 opens, 0 shorts | 2026-08-08 | Rachel Lindqvist |
+| Ball map vs. KST-ARCH-001 interface signal list (CHK-SPEC-02) | PASS: 761/761 signal balls assigned; 0 unassigned interface signals; 6 reserved test pads TP_0..TP_5 (section 7.12) excluded | 2026-09-01 | Rachel Lindqvist |
+| Ball map vs. top-level ports of kst_top_nl_2026.08.31 | PASS: 761 ports matched | 2026-08-31 | Rachel Lindqvist |
+| I/O cell max VDDIO >= bank VDDIO (section 3.1 vs section 4) | PASS (4/4 banks) | 2026-08-31 | Rachel Lindqvist |
+| Pad-ring LVS / ERC, GPIO segment incl. ring breakers | PASS, 0 errors | 2026-08-29 | Daniel Achterberg |
+| ESD network check (HBM 1 kV, CDM 250 V), per GPIO bank and all PHY hard-macro pads | PASS (incl. PHY-LP5X-N5 v2.7.0 macro pads after ECO-B-004) | 2026-08-29 | Rachel Lindqvist |
+| Bump-to-ball netlist (package / die co-design) | PASS, 0 opens, 0 shorts | 2026-08-29 | Rachel Lindqvist |
 | Substrate DRC (SUB-R07) | PASS | 2026-08-06 | Rachel Lindqvist |
 | Power-ball current capacity (0.35 A per ball at 105 C) | PASS, worst VDD_NPU 0.21 A per ball | 2026-08-10 | Grace Adeyemi |
-| SSO / ground bounce per GPIO bank | PASS, worst bank 71 mV (budget 120 mV) | 2026-08-10 | Rachel Lindqvist |
+| SSO / ground bounce per GPIO bank | PASS, worst bank 76 mV (budget 120 mV) | 2026-08-31 | Rachel Lindqvist |
 | PCIE0 package channel, lanes 0..15 | PASS, worst insertion loss 2.9 dB at 16 GHz | 2026-08-07 | Leo Brandt |
 | LPDDR5X package SI, byte-lane skew | PASS, worst 4.1 ps (budget 5 ps) | 2026-08-07 | Anjali Deshmukh |
 
@@ -426,9 +428,9 @@ Total LPDDR5X signal balls: 32 x 13 + 4 x 46 = 600.
 
 | Role | Name | Decision | Date |
 |---|---|---|---|
-| Package & I/O Lead (author) | Rachel Lindqvist | Approved | 2026-08-11 |
-| Chief Architect | Priya Raghavan | Approved | 2026-08-11 |
-| Physical Design Lead | Daniel Achterberg | Approved | 2026-08-11 |
+| Package & I/O Lead (author) | Rachel Lindqvist | Approved | 2026-09-01 |
+| Chief Architect | Priya Raghavan | Approved | 2026-09-01 |
+| Physical Design Lead | Daniel Achterberg | Approved | 2026-09-01 |
 | Power Integrity Lead | Grace Adeyemi | Reviewed (power-ball allocation) | 2026-08-10 |
 | PCIe Subsystem Owner | Leo Brandt | Reviewed (PCIE0/PCIE1 ball-out) | 2026-08-09 |
 | Memory Subsystem Owner (LPDDR5X) | Anjali Deshmukh | Reviewed (LPDDR5X ball-out) | 2026-08-09 |

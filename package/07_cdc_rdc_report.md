@@ -4,31 +4,31 @@
 |---|---|
 | Doc ID | KST-CDC-030 |
 | Title | CDC / RDC Sign-off Report |
-| Revision | A |
-| Date | 2026-08-12 |
+| Revision | B (supersedes A) |
+| Date | 2026-09-02 |
 | Owner | Hiroshi Tanabe (CDC/RDC Owner) |
-| Status | Released for TRR-1 |
+| Status | Released for TRR-2 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
 ## 1. Purpose and scope
 
-This report records clock-domain-crossing (CDC) and reset-domain-crossing (RDC) sign-off for the full KESTREL chip (`kst_top`) on netlist **kst_top_nl_2026.08.07**, for TRR-1 (2026-08-14). Rules: ALD-QA-CHK-007 rev 7.2, CHK-CDC-01 to CHK-CDC-06. Clock plan and power states: KST-ARCH-001. Synchronous paths inside a clock group: KST-STA-020.
+This report records clock-domain-crossing (CDC) and reset-domain-crossing (RDC) sign-off for the full KESTREL chip (`kst_top`) on netlist **kst_top_nl_2026.08.31**, for TRR-2 (2026-09-04). Rules: ALD-QA-CHK-007 rev 7.2, CHK-CDC-01 to CHK-CDC-06. Clock plan and power states: KST-ARCH-001. Synchronous paths inside a clock group: KST-STA-020.
 
 Hard macros (PCIe PHY, LPDDR5X controller and PHY, PLLs, OTP) use vendor CDC abstract models at the KST-IPBOM-050 versions for this package. PCIE1 (`u_pcie1_wrap`) is fused off (`FUSE_PCIE1_DIS=1`) but present in silicon, so its crossings are analyzed like any other block.
 
 ## 2. Sign-off summary
 
-**Result: 1,284 crossings; 1,241 clean; 43 waived; 0 unwaived.** Reset-domain analysis: 318 RDC paths, 0 unwaived. CDC/RDC status for TRR-1: **GREEN**.
+**Result: 1,286 crossings; 1,244 clean; 42 waived; 0 unwaived.** Reset-domain analysis: 320 RDC paths, 0 unwaived. CDC/RDC status for TRR-2: **GREEN**.
 
 | Rule | Requirement | Result | Status |
 |---|---|---|---|
-| CHK-CDC-01 | 100% of crossings classified; 0 unwaived violations | 1,284 of 1,284 classified; 0 unwaived | PASS |
+| CHK-CDC-01 | 100% of crossings classified; 0 unwaived violations | 1,286 of 1,286 classified; 0 unwaived | PASS |
 | CHK-CDC-02 | 2-FF for destination <= 800 MHz, 3-FF for destination > 800 MHz; MTBF >= 1,000 years per synchronizer | 0 depth violations; worst synchronizer MTBF 5.2E+11 years (Section 8) | PASS |
 | CHK-CDC-03 | Multi-bit via gray code, req/ack handshake or async FIFO | 0 through independent synchronizers; others ASYNC_FIFO, HANDSHAKE, GRAY_CNT or quasi-static under CHK-CDC-04 waivers | PASS |
-| CHK-CDC-04 | Quasi-static only for level signals with documented stability; never for pulses | 37 quasi-static waivers; 0 crossings declared pulse without PULSE_SYNC or HANDSHAKE | PASS |
+| CHK-CDC-04 | Quasi-static only for level signals with documented stability; never for pulses | 36 quasi-static waivers; 0 crossings declared pulse without PULSE_SYNC or HANDSHAKE | PASS |
 | CHK-CDC-05 | RDC: async assert, sync de-assert; 0 unwaived RDC violations | 0 unsynchronized de-assertions; 0 unwaived RDC violations | PASS |
-| CHK-CDC-06 | Waivers approved by CDC Owner and block owner | 43 of 43 active waivers carry both approvals | PASS |
+| CHK-CDC-06 | Waivers approved by CDC Owner and block owner | 42 of 42 active waivers carry both approvals | PASS |
 
 ## 3. Tool setup and methodology
 
@@ -36,7 +36,7 @@ Hard macros (PCIe PHY, LPDDR5X controller and PHY, PLLs, OTP) use vendor CDC abs
 
 | Item | Value |
 |---|---|
-| Design / netlist | `kst_top`, kst_top_nl_2026.08.07; runs 2026-08-09 .. 2026-08-10 |
+| Design / netlist | `kst_top`, kst_top_nl_2026.08.31; runs 2026-08-31 .. 2026-09-01 |
 | Structural CDC tool | Clock/reset inference, synchronizer recognition, reconvergence, glitch and logic-before-synchronizer checks |
 | Formal CDC/RDC tool | Handshake protocol, gray-code and pulse-spacing properties, stability SVAs, reset ordering, RDC |
 | Logic simulator | Metastability-injection simulation (random 0/1-cycle delay on every recognized synchronizer): 214 SoC tests, 0 failures |
@@ -97,8 +97,8 @@ Unwaived crossings: 0 in every pair.
 | pcie1_core_clk -> core_clk | 61 | 61 | 0 |
 | pcie_core_clk -> pcie_aux_clk | 17 | 17 | 0 |
 | pcie_aux_clk -> pcie_core_clk | 15 | 15 | 0 |
-| aon_clk -> core_clk | 46 | 41 | 5 |
-| core_clk -> aon_clk | 27 | 27 | 0 |
+| aon_clk -> core_clk | 47 | 43 | 4 |
+| core_clk -> aon_clk | 28 | 28 | 0 |
 | aon_clk -> npu_clk | 9 | 7 | 2 |
 | aon_clk -> cpu_clk | 3 | 3 | 0 |
 | aon_clk -> mc_clk | 8 | 6 | 2 |
@@ -115,7 +115,7 @@ Unwaived crossings: 0 in every pair.
 | tck -> periph_clk | 3 | 2 | 1 |
 | core_clk / npu_clk / cpu_clk -> tck | 14 | 14 | 0 |
 | async (pads, PHY, PLL lock, ring osc) -> all domains | 135 | 132 | 3 |
-| **Total** | **1,284** | **1,241** | **43** |
+| **Total** | **1,286** | **1,244** | **42** |
 
 ### 5.2 By synchronization scheme
 
@@ -123,13 +123,13 @@ Unwaived crossings: 0 in every pair.
 |---|---|---|---|---|
 | ASYNC_FIFO | 212 | 212 | 0 | Gray-coded pointers; gray property formally proven |
 | HANDSHAKE | 187 | 187 | 0 | 4-phase req/ack; data held from req to ack (formal proof) |
-| PULSE_SYNC | 64 | 64 | 0 | Source toggle + N-FF + edge detect; event spacing formally checked |
+| PULSE_SYNC | 65 | 65 | 0 | Source toggle + N-FF + edge detect; event spacing formally checked |
 | GRAY_CNT | 23 | 23 | 0 | Hamming distance 1 per update (formal) |
 | RESET_SYNC | 58 | 58 | 0 | RSTSYNC2_X2 / RSTSYNC3_X2 |
-| SYNC_3FF | 486 | 481 | 5 | SYNC3_X2, destinations > 800 MHz; 5 reconvergence waivers |
-| SYNC_2FF | 217 | 216 | 1 | SYNC2_X2, destinations <= 800 MHz; 1 reconvergence waiver |
-| None (quasi-static) | 37 | 0 | 37 | Declared quasi_static; waiver required |
-| **Total** | **1,284** | **1,241** | **43** | 37 quasi-static + 6 reconvergence waivers |
+| SYNC_3FF | 487 | 482 | 5 | SYNC3_X2, destinations > 800 MHz; 5 reconvergence waivers |
+| SYNC_2FF | 218 | 217 | 1 | SYNC2_X2, destinations <= 800 MHz; 1 reconvergence waiver |
+| None (quasi-static) | 36 | 0 | 36 | Declared quasi_static; waiver required |
+| **Total** | **1,286** | **1,244** | **42** | 36 quasi-static + 6 reconvergence waivers |
 
 ## 6. Top-level crossing groups
 
@@ -183,7 +183,7 @@ CDC-0101 to CDC-0160 are the top-level inter-block crossing groups (CDC-0150 is 
 | CDC-0144 | u_aon/u_tamper/tamper_q (aon_clk) | u_sec_encl/u_alert/tamper_sync_q (sec_clk) | 1 | level | SYNC_2FF | CDC_SYNC_OK | Clean |
 | CDC-0145 | u_dbg/u_tap/sec_unlock_req_q (tck) | u_sec_encl/u_dbg_auth/req_sync_q (sec_clk) | 1 | req_ack | HANDSHAKE | CDC_HSK_OK | Clean |
 | CDC-0146 | u_aon/u_pmu/u_pstate_fsm/pmu_sleep_req_q (aon_clk) | u_core/u_pmu_if/sleep_req_sync_q (core_clk) | 1 | req_ack | HANDSHAKE | CDC_HSK_OK | Clean |
-| CDC-0147 | u_aon/u_pmu/u_wake_ctl/wake_req_q (aon_clk) | u_core/u_pmu_if/wake_pending_q (core_clk) | 1 | quasi_static | None | CDC_NO_SYNC | Waived (W-CDC-022) |
+| CDC-0147 | u_aon/u_pmu/u_wake_ctl/wake_req_q (aon_clk) | u_core/u_pmu_if/wake_pending_q via u_core/u_pmu_if/u_wake_psync (core_clk) | 1 | pulse | PULSE_SYNC (aon_clk toggle + 3-FF + edge detect) | CDC_PSYNC_OK | Clean (ECO-B-005) |
 | CDC-0148 | u_core/u_pmu_if/core_sleep_ack_q + core_lp_req_q[1:0] (core_clk) | u_aon/u_pmu/u_pstate_fsm/sleep_ack_sync_q (aon_clk) | 3 | req_ack | HANDSHAKE | CDC_HSK_OK | Clean |
 | CDC-0149 | u_aon/u_pmu/u_pstate_fsm/pstate_gray_q[1:0] (aon_clk) | u_core/u_pmu_if/pstate_sts_q[1:0] (core_clk) | 2 | gray | GRAY_CNT | CDC_GRAY_OK | Clean |
 | CDC-0150 | u_aon/u_pmu/u_pstate_fsm/div64_entry_req_q (aon_clk) | u_core/u_crg/u_div64_ctl/entry_req_sync_q (core_clk) | 1 | req_ack | HANDSHAKE | CDC_HSK_OK | Clean |
@@ -198,9 +198,16 @@ CDC-0101 to CDC-0160 are the top-level inter-block crossing groups (CDC-0150 is 
 | CDC-0159 | u_dbg/u_tap/tdr_mbist_cfg_q[31:0] (tck) | u_npu_c{0..3}/u_mbist_ctl/cfg_q[31:0] (npu_clk) | 32 | quasi_static | None | CDC_NO_SYNC | Waived (W-CDC-002) |
 | CDC-0160 | TRST_N pad & por_n (async) | u_dbg/u_tap/u_rst_sync (tck) | 1 | reset | RESET_SYNC | CDC_RSTSYNC_OK | Clean |
 
+Crossings added since revision A (inside `u_core/u_pmu_if/u_wake_psync`):
+
+| ID | Source (instance, clock) | Destination (instance, clock) | Width | Designer-declared class | Sync scheme | Rule | Status |
+|---|---|---|---|---|---|---|---|
+| CDC-0451 | u_core/u_pmu_if/u_wake_psync/dst_ack_tgl_q (core_clk) | u_core/u_pmu_if/u_wake_psync/src_ack_sync_q (aon_clk) | 1 | level | SYNC_2FF | CDC_SYNC_OK | Clean (ECO-B-005) |
+| CDC-0452 | u_core/u_pmu_if/u_wake_psync/src_busy_q (aon_clk) | u_core/u_pmu_if/u_wake_psync/busy_sync_q (core_clk) | 1 | level | SYNC_3FF | CDC_SYNC_OK | Clean (ECO-B-005) |
+
 ## 7. CDC waiver register
 
-43 active waivers: 37 quasi-static and 6 reconvergence. Approvals follow CHK-CDC-06.
+42 active waivers: 36 quasi-static and 6 reconvergence. Approvals follow CHK-CDC-06. W-CDC-022 is withdrawn and kept in the register for traceability.
 
 | Waiver | Crossing | Signal (source -> destination) | Declared class; category | Justification and stability guarantee | Requested | Approved | Status |
 |---|---|---|---|---|---|---|---|
@@ -225,7 +232,7 @@ CDC-0101 to CDC-0160 are the top-level inter-block crossing groups (CDC-0150 is 
 | W-CDC-019 | CDC-0322 | u_fuse_shadow/dev_id_q[63:0] (aon_clk) -> u_sysctl/dev_id_q[63:0] (core_clk) | Level; quasi-static (OTP) | Device ID / lot-trace fuses loaded at POR while core_rst_n is asserted; read-only afterwards; SVA a_dev_id_stable | K. Mensah, 2026-07-10 | H. Tanabe (CDC Owner); K. Mensah (PMU Owner), 2026-07-15 | Approved |
 | W-CDC-020 | CDC-0331 | u_npu_csr/tile_en_q[15:0] (core_clk) -> u_npu_c{0..3}/u_ctl/tile_en_q (npu_clk) | Level; quasi-static (SW rule) | Boot firmware writes with clusters in npu_rst_n, npu_clk gated (NPU PG 2.3); HW ignores writes outside reset; SVA a_tile_en_stable | V. Halloran, 2026-07-20 | H. Tanabe (CDC Owner); V. Halloran (NPU Owner), 2026-07-24 | Approved |
 | W-CDC-021 | CDC-0341 | u_fuse_shadow/io_drv_cfg_q[31:0] (aon_clk) -> u_padctl/drv_cfg_q[31:0] (periph_clk) | Level; quasi-static (OTP) | Pad drive/slew defaults loaded at POR with u_periph in reset; SW overrides use a separate register; SVA a_io_drv_cfg_stable | R. Lindqvist, 2026-07-16 | H. Tanabe (CDC Owner); R. Lindqvist (Package & I/O Lead), 2026-07-21 | Approved |
-| W-CDC-022 | CDC-0147 | u_wake_ctl/wake_req_q (aon_clk) -> u_pmu_if/wake_pending_q (core_clk) | Level; quasi-static (power-state) | Signal is quasi-static; only toggles on power-state transitions. | K. Mensah, 2026-08-05 | H. Tanabe (CDC Owner); K. Mensah (PMU Owner), 2026-08-07 | Approved |
+| W-CDC-022 | CDC-0147 | u_wake_ctl/wake_req_q (aon_clk) -> u_pmu_if/wake_pending_q (core_clk) | Level; quasi-static (power-state) | Signal is quasi-static; only toggles on power-state transitions. | K. Mensah, 2026-08-05 | H. Tanabe (CDC Owner); K. Mensah (PMU Owner), 2026-08-07 | Withdrawn - replaced by pulse synchronizer, ECO-B-005 |
 | W-CDC-023 | CDC-0332 | u_npu_csr/sparse_cfg_q[31:0] (core_clk) -> u_tile{0..3}/sparse_cfg_q (npu_clk) | Level; quasi-static (SW rule) | Driver rule NPU PG 3.4: written only while the cluster is idle and clock-gated; HW guard on cluster_busy; SVA a_sparse_cfg_stable | V. Halloran, 2026-07-20 | H. Tanabe (CDC Owner); V. Halloran (NPU Owner), 2026-07-24 | Approved |
 | W-CDC-024 | CDC-0333 | u_npu_csr/qos_cfg_q[15:0] (core_clk) -> u_nbr/qos_cfg_q[15:0] (npu_clk) | Level; quasi-static (SW rule) | Written before cluster enable with npu_clk gated (NPU PG 2.5); HW write-guard on npu_clk_en; SVA a_nbr_qos_stable | V. Halloran, 2026-07-20 | H. Tanabe (CDC Owner); V. Halloran (NPU Owner), 2026-07-24 | Approved |
 | W-CDC-025 | CDC-0701 | u_mc{0..3}/init_done_q, train_err_q (mc_clk) -> u_mc_csr/init_sts_q[1:0] (core_clk) | Level (per bit); reconvergence (status) | Independent SYNC_3FF bits meet only in a SW-read register; no HW consumer; driver polls init_done, then reads train_err | A. Deshmukh, 2026-07-15 | H. Tanabe (CDC Owner); A. Deshmukh (Memory Owner), 2026-07-20 | Approved |
@@ -298,9 +305,9 @@ Reset ordering declared in the CDC intent and proven by the formal tool: por_n i
 | Asynchronous reset pins driven from a RESET_SYNC output (or the DFT bypass mux, test_mode only) | 100% |
 | Reset de-assertion not synchronized to the destination clock | 0 |
 | Combinational logic on reset paths other than RSTMUX and AND of synchronized resets | 0 |
-| RDC paths (source and destination flops on different reset domains) | 318 |
-| Clean by proven reset ordering | 251 |
-| Clean by isolation or qualifier (destination gated or isolated while source is in reset) | 64 |
+| RDC paths (source and destination flops on different reset domains) | 320 |
+| Clean by proven reset ordering | 252 |
+| Clean by isolation or qualifier (destination gated or isolated while source is in reset) | 65 |
 | Waived (W-RDC-001 to W-RDC-003) | 3 |
 | Unwaived | 0 |
 
@@ -318,6 +325,25 @@ Open CDC/RDC items: none. All CHK-CDC rules PASS on this netlist.
 
 | Role | Name | Action | Date |
 |---|---|---|---|
-| CDC/RDC Owner | Hiroshi Tanabe | Signed off | 2026-08-12 |
-| Quality & Tape-out Gatekeeper | Oren Feldman | Received for TRR-1 | 2026-08-12 |
+| CDC/RDC Owner | Hiroshi Tanabe | Signed off | 2026-09-02 |
+| Quality & Tape-out Gatekeeper | Oren Feldman | Received for TRR-2 | 2026-09-02 |
+
+## Revision history
+
+| Rev | Date | Author | Changes |
+|---|---|---|---|
+| A | 2026-08-12 | Hiroshi Tanabe | Initial release for TRR-1 on netlist kst_top_nl_2026.08.07: 1,284 crossings; 1,241 clean; 43 waived; 0 unwaived. |
+| B | 2026-09-02 | Hiroshi Tanabe | Full re-run on kst_top_nl_2026.08.31. CDC-0147 (wake_req_q) re-classified quasi_static -> pulse after TRR-1 (one aon_clk cycle, 40 ns, shorter than the 64 ns LP-IDLE core_clk period; CHK-CDC-04). ECO-B-005 adds u_core/u_pmu_if/u_wake_psync (toggle, SYNC3_X2, edge detect, ack toggle); CDC-0147 Clean, W-CDC-022 withdrawn. +2 clean crossings (CDC-0451, CDC-0452), +2 RDC paths (clean by reset ordering and the psync reset qualifier). Totals: 1,286 crossings; 1,244 clean; 42 waived; 0 unwaived. |
+
+ECO impact on CDC/RDC for this revision:
+
+| Change | CDC/RDC impact |
+|---|---|
+| ECO-B-001 (NoC router credit return) | core_clk-internal; no crossing change |
+| ECO-B-002 (NPU DMA interrupt coalescing) | npu_clk side, upstream of CDC-0103; no crossing change |
+| ECO-B-003 (u_sec_encl/u_keyldr delay cells) | sec_clk-internal; no crossing change |
+| ECO-B-004 (LPDDR5X IP drop, KST-IPBOM-050) | Abstract models refreshed; boundary crossings and W-CDC-014..016 register lists unchanged |
+| ECO-B-005 (u_core/u_pmu_if/u_wake_psync) | CDC-0147 now PULSE_SYNC; +2 crossings; W-CDC-022 withdrawn |
+| ECO-B-006 (I2C0 glitch-filter default) | Reset value only; no crossing change |
+| CHG-B-002 (GPIO_B I/O cells) | Pad-cell swap; input synchronizers unchanged |
 
