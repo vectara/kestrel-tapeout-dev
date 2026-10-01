@@ -4,19 +4,19 @@
 |---|---|
 | Doc ID | KST-PI-040 |
 | Title | Power Integrity (IR / EM) Sign-off Report |
-| Revision | A |
-| Date | 2026-08-11 |
+| Revision | B (supersedes A) |
+| Date | 2026-09-02 |
 | Owner | Grace Adeyemi (PI Lead) |
-| Status | Released for TRR-1 |
+| Status | Released for TRR-2 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
 ## 1. Purpose and scope
 
-This report records full-chip power-integrity sign-off of ALX-5100 (KESTREL) for TRR-1 (2026-08-14). It covers static IR drop, dynamic IR drop (vectorless and vector-based) and electromigration (signal and power/ground) on the core supply rails, checked against the tape-out readiness checklist ALD-QA-CHK-007 rev 7.2, rules CHK-PI-01, CHK-PI-02 and CHK-PI-03.
+This report records full-chip power-integrity sign-off of ALX-5100 (KESTREL) for TRR-2 (2026-09-04). It covers static IR drop, dynamic IR drop (vectorless and vector-based) and electromigration (signal and power/ground) on the core supply rails, checked against the tape-out readiness checklist ALD-QA-CHK-007 rev 7.2, rules CHK-PI-01, CHK-PI-02 and CHK-PI-03.
 
-- Analysed netlist: `kst_top_nl_2026.08.07` (full chip, flat power/ground).
-- Analysed layout: `kst_top_pnr_2026.08.07` (post-route, post-metal-fill).
+- Analysed netlist: `kst_top_nl_2026.08.31` (full chip, flat power/ground).
+- Analysed layout: `kst_top_pnr_2026.08.31` (post-route, post-metal-fill).
 - Process: foundry N5-class FinFET, 1P15M (two thick top metals + AP/RDL), 300 mm wafers. Die 19.20 mm x 18.80 mm.
 
 ### 1.1 Rails in scope
@@ -44,7 +44,7 @@ PHY hard macros are modelled as black boxes with vendor current models on their 
 
 ## 2. Sign-off summary
 
-**Result: PASS on all in-scope rails.** Static IR, dynamic IR and EM meet ALD-QA-CHK-007 rev 7.2 on netlist `kst_top_nl_2026.08.07`. No PI waivers are requested and there are no open PI items.
+**Result: PASS on all in-scope rails.** Static IR, dynamic IR and EM meet ALD-QA-CHK-007 rev 7.2 on netlist `kst_top_nl_2026.08.31`. No PI waivers are requested and there are no open PI items.
 
 ### 2.1 Rail summary
 
@@ -68,7 +68,7 @@ Percentages are of rail nominal. Dynamic IR is the worst of the vectorless run a
 
 ### 2.3 Checklist compliance
 
-| Rule | Requirement (ALD-QA-CHK-007 rev 7.2) | Result on `kst_top_nl_2026.08.07` | Status |
+| Rule | Requirement (ALD-QA-CHK-007 rev 7.2) | Result on `kst_top_nl_2026.08.31` | Status |
 |---|---|---|---|
 | CHK-PI-01 | Static IR drop per rail <= 2.5% of nominal | Worst 1.6% (VDD_NPU); VDD_CORE 1.1%, VDD_SRAM 0.9%, VDD_AON 0.3% | PASS |
 | CHK-PI-02 | Dynamic IR, worst of vectorless and vector-based, worst per-cycle effective drop: VDD_NPU and VDD_CORE <= 8.0%, VDD_SRAM <= 6.0%, VDD_AON <= 5.0% of nominal | VDD_NPU 7.4%, VDD_CORE 5.2%, VDD_SRAM 4.1%, VDD_AON 1.2% | PASS |
@@ -81,19 +81,19 @@ Percentages are of rail nominal. Dynamic IR is the worst of the vectorless run a
 | Item | Setting |
 |---|---|
 | Tool | IR/EM sign-off tool, production release qualified in the foundry N5-class reference flow. The same release and settings are used for every run in this report |
-| Netlist | `kst_top_nl_2026.08.07` |
-| Layout | `kst_top_pnr_2026.08.07` (post-route, post-metal-fill, spare cells tied) |
+| Netlist | `kst_top_nl_2026.08.31` |
+| Layout | `kst_top_pnr_2026.08.31` (post-route, post-metal-fill, spare cells tied) |
 | Signal parasitics | Typical RC at 85 C, used for switching power (load capacitance) |
 | PG extraction | In-tool PG grid extraction at rcworst, metal temperature 105 C, all layers M0-M15 + AP, vias as arrays |
-| Current models | STDCELL-N5-H210 v1.2 (SVT/LVT/ULVT) tt_0p750v_85c current libraries; leakage scaled to Tj 105 C. SRAM-N5-COMP v2.1 macro current models. Vendor current models for PCIe and LPDDR5X PHY hard macros (core-side pins) |
+| Current models | STDCELL-N5-H210 v1.2 (SVT/LVT/ULVT) tt_0p750v_85c current libraries; leakage scaled to Tj 105 C. SRAM-N5-COMP v2.1 macro current models. Vendor current models for PCIe and LPDDR5X PHY hard macros (core-side pins; PHY-LP5X-N5 v2.7.0 models from ECO-B-004, PCIE5-PHY-N5 v1.4) |
 | Technology / EM rules | Foundry N5-class IR/EM technology file and EM rule set, sign-off revision |
 | Package model | PKG-RLC-KST-v3, distributed RLC per bump group, from Package & I/O (Rachel Lindqvist), released 2026-07-24 (section 3.4) |
 | Board / VRM model | Reference-card PDN model R2: PMIC output impedance plus bulk and MLCC network per core rail |
 | Temperature | Tj 105 C for IR (leakage and metal resistance); Tj 110 C for EM |
 | Transient solver | 10 ps time step; per-instance current waveforms from library current models; package and board RLC co-simulated |
 | Dynamic IR metric | Per-instance effective drop (VDD droop + VSS bounce) averaged over one period of the region's own local clock (0.667 ns cpu_clk, 0.833 ns npu_clk, 0.938 ns mc_clk, 1.000 ns core_clk and pcie_core_clk, 2.000 ns sec_clk, 5.000 ns periph_clk, 40 ns aon_clk), i.e. the effective voltage seen by timing; the worst cycle over the analysed window is reported (CHK-PI-02 definition) |
-| Run window | 2026-08-08 .. 2026-08-10 |
-| Run IDs | `pi_kst_a0808_static`, `pi_kst_a0808_vl`, `pi_kst_a0808_vb01` .. `pi_kst_a0808_vb07`, `pi_kst_a0808_inrush`, `em_kst_a0808_sig`, `em_kst_a0808_pg` |
+| Run window | 2026-08-31 .. 2026-09-01 |
+| Run IDs | `pi_kst_b0831_static`, `pi_kst_b0831_vl`, `pi_kst_b0831_vb01` .. `pi_kst_b0831_vb07`, `pi_kst_b0831_inrush`, `em_kst_b0831_sig`, `em_kst_b0831_pg` |
 
 ### 3.2 PDN grid (global grid on M13-M15 + AP)
 
@@ -164,7 +164,7 @@ The windows were captured on the emulation platform from full-chip workload runs
 | VB06 | vec_pcie_dma_saturate | PCIe Gen5 x16 DMA read and write at link saturation into u_gbuf through u_noc | pcie_core_clk, core_clk, npu_clk | 400 ns | Peak u_pcie0_wrap current |
 | VB07 | vec_idle_to_active_step | LP-IDLE to ACTIVE: core_clk from 15.625 MHz to 1000.0 MHz, NPU cluster clock ungating with hardware stagger, CPU wake | all functional clocks | 1,200 ns | Largest supply ramp (di/dt) |
 
-Scan shift (test mode; owned by DFT, KST-DFT-EXC section 2): ATPG engineering pattern set v0.8 analysed at 200 MHz shift with low-power (adjacent) fill and 4 staggered chain groups, run `pi_kst_a0809_shift`; worst effective drop VDD_NPU 6.3%, VDD_CORE 4.9%, inside the CHK-PI-02 budgets.
+Scan shift (test mode; owned by DFT, KST-DFT-EXC section 2): ATPG pattern set v0.9.1 analysed at 200 MHz shift with low-power (adjacent) fill and 4 staggered chain groups, run `pi_kst_b0901_shift`; worst effective drop VDD_NPU 6.3%, VDD_CORE 4.9%, inside the CHK-PI-02 budgets.
 
 ## 5. Static IR results
 
@@ -353,7 +353,21 @@ During A0 bring-up the PVT-MON-N5 supply-voltage sensors on the core rails will 
 
 | Role | Name | Decision | Date |
 |---|---|---|---|
-| PI Lead (author) | Grace Adeyemi | Signed off: PASS, all in-scope rails | 2026-08-11 |
-| Physical Design Lead | Daniel Achterberg | Reviewed: agree | 2026-08-11 |
-| NPU Cluster Owner | Viktor Halloran | Reviewed VDD_NPU results: agree | 2026-08-11 |
-| Package & I/O Lead | Rachel Lindqvist | Confirmed PKG-RLC-KST-v3 as the package model for this run | 2026-08-11 |
+| PI Lead (author) | Grace Adeyemi | Signed off: PASS, all in-scope rails | 2026-09-02 |
+| Physical Design Lead | Daniel Achterberg | Reviewed: agree | 2026-09-02 |
+| NPU Cluster Owner | Viktor Halloran | Reviewed VDD_NPU results: agree | 2026-09-02 |
+| Package & I/O Lead | Rachel Lindqvist | Confirmed PKG-RLC-KST-v3 as the package model for this run | 2026-09-02 |
+
+## 14. Revision history
+
+| Rev | Date | Author | Change |
+|---|---|---|---|
+| A | 2026-08-11 | Grace Adeyemi | Initial release for TRR-1 on kst_top_nl_2026.08.07. |
+| B | 2026-09-02 | Grace Adeyemi | Re-run on kst_top_nl_2026.08.31 (B); ECOs are in VDD_CORE partitions except ECO-B-002 (u_npu_c0..u_npu_c3/u_dma, VDD_NPU); worst-region delta < 0.1 mV on VDD_CORE and VDD_NPU; PHY-LP5X-N5 v2.7.0 current models integrated (ECO-B-004); all results unchanged. |
+
+Rev B details:
+
+- Netlist `kst_top_nl_2026.08.31` includes ECO-B-001 .. ECO-B-006 (see KST-ECO-062). Static IR, vectorless and vector-based dynamic IR (VB01..VB07) and signal and PG EM were re-run in full on `kst_top_pnr_2026.08.31`. The package model (PKG-RLC-KST-v3), board model and emulation windows are unchanged.
+- VDD_CORE and VDD_NPU worst-region deltas against rev A are below 0.1 mV in every region (ECO-B-002 changes 27 cells per cluster in u_npu_c0..u_npu_c3/u_dma, away from the u_npu_c2/u_tile3 hotspot), below the reporting resolution. u_ddr_ss uses the PHY-LP5X-N5 v2.7.0 vendor current models delivered with ECO-B-004. The v2.7.0 core-side current models differ from v2.6.1 only in the training/calibration block, which is idle in vec_mem_stream_273gbps, and the incremental u_mc0..u_mc3 re-synthesis (training sequencer, training interface and link-ECC counter only) changed fewer than 1% of controller cells; the u_ddr_ss/u_mc2 worst window moves by +0.04 mV. Reported values are unchanged.
+- CHG-B-002 is a pad-ring I/O cell change on an I/O bank supply and is outside the scope of this report (section 1.2).
+- EM: 0 signal EM and 0 PG EM violations, the same as rev A.
