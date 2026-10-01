@@ -917,7 +917,10 @@ def cmd_explain(a, gh: GH) -> int:
         cm = gh.r("GET", f"/pulls/comments/{a.comment_id}")
     else:
         cm = gh.r("GET", f"/issues/comments/{a.comment_id}")
-    if cm.get("author_association") not in ("OWNER", "MEMBER", "COLLABORATOR"):
+    # The workflow gates on the event's author_association; the Actions token's REST view of the same comment can
+    # report a weaker association (it cannot see org membership), so the event value wins when present.
+    assoc = os.environ.get("COMMENT_AUTHOR_ASSOCIATION") or cm.get("author_association")
+    if assoc not in ("OWNER", "MEMBER", "COLLABORATOR"):
         log("ignoring /tapeout from a non-member")
         return 0
     text = (cm.get("body") or "").strip()
