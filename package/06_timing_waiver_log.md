@@ -4,10 +4,10 @@
 |---|---|
 | Doc ID | KST-STA-021 |
 | Title | Timing Waiver Log |
-| Revision | B (supersedes A) |
-| Date | 2026-09-02 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-23 |
 | Owner | Mei-Lin Chou (STA Lead) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
@@ -18,16 +18,18 @@
 | A | 2026-08-12 | Mei-Lin Chou | Initial release for TRR-1: W-001..W-024. |
 | B | 2026-09-02 | Mei-Lin Chou | W-017 Withdrawn - violation fixed by ECO-B-003 (2 x DLY2_X1 at the D pin; hold +0.015 ns in func_ff_0p825v_m40c_cbest_ccbest). |
 | B | 2026-09-02 | Mei-Lin Chou | W-001, W-003, W-012 and W-019 re-confirmed against the MC-LP5X / PHY-LP5X-N5 v2.7.0 netlist and timing models (ECO-B-004); scope unchanged. No new waivers. |
+| C | 2026-09-23 | Mei-Lin Chou | W-017 fix reference updated: ECO-B-003 delay cells replaced by ECO-C-002 (1 x DLY4_X1 on the ECC-bypass branch; hold +0.013 ns); status remains Withdrawn. |
+| C | 2026-09-23 | Mei-Lin Chou | All entries re-validated against the full 14-view MCMM run sta_kst_0922_full on kst_top_nl_2026.09.19 (ECO-C-001..ECO-C-003). ECO-C-001 (u_periph, 37 spare cells re-tied, +12 tie cells): W-011 scope re-confirmed, no new DRVs. No new waivers. |
 
 ## 1. Purpose
 
-This log is the register of timing waivers and timing exceptions referenced by KST-STA-020 (Static Timing Analysis Sign-off Report) rev B. It covers:
+This log is the register of timing waivers and timing exceptions referenced by KST-STA-020 (Static Timing Analysis Sign-off Report) rev C. It covers:
 
 - violations that remain visible in the sign-off reports and are waived (for example DFT reporting-only exceptions);
 - multicycle exceptions in test modes that are added to the SDC as explicit from-lists;
 - non-slack checks (max transition, max capacitance, minimum pulse width, clock-gating) and unconstrained analog-test or asynchronous pins.
 
-Entries are raised and approved under ALD-QA-CHK-007 rev 7.2 (CHK-STA-04, CHK-STA-05, CHK-STA-06). Sign-off netlist for this revision: kst_top_nl_2026.08.31; STA run sta_kst_0902_full (2026-09-02). Entries raised before kst_top_nl_2026.07.17 were first triaged on pre-freeze trial netlists; every entry is re-validated on the sign-off run named above, and the slack shown is from that run.
+Entries are raised and approved under ALD-QA-CHK-007 rev 7.2 (CHK-STA-04, CHK-STA-05, CHK-STA-06). Sign-off netlist for this revision: kst_top_nl_2026.09.19; STA run sta_kst_0922_full (2026-09-22). Entries raised before kst_top_nl_2026.07.17 were first triaged on pre-freeze trial netlists; every entry is re-validated on the sign-off run named above, and the slack shown is from that run.
 
 ## 2. Approver matrix
 
@@ -61,7 +63,7 @@ Entries are raised and approved under ALD-QA-CHK-007 rev 7.2 (CHK-STA-04, CHK-ST
 | W-014 | scan_shift_ss_0p675v_m40c_cworst_ccworst | Clock-gating setup | u_core/u_crg/u_occ0..u_occ5/u_shift_cg/E (6) | -0.022 | Shift-clock gate enables are driven by stage 3 of the pipelined scan enable (se_pipe); the ATPG protocol inserts 4 dead cycles after every SE transition before the first shift or capture pulse. | KST-DFT-EXC rev 3 entry TE-DFT-008; KST_scan_shift.sdc r3.2; ATPG protocol KST_atpg_proto r5 | Ayesha Qureshi / 2026-07-02 | Mei-Lin Chou, Samir Haddad | 2026-07-06 | Approved |
 | W-015 | func (all 9 functional views) | Unconstrained endpoint | u_core/u_pvt_mon_00..u_pvt_mon_23/ANA_TEST (24 pins) | n/a | PVT-MON-N5 analog test outputs, ATE characterization only; no digital receiver. | KST_func.sdc r4.2 (explicit pin list); PVT-MON-N5 integration note sec. 4 | Jonah Pike / 2026-07-06 | Mei-Lin Chou, Kofi Mensah | 2026-07-09 | Approved |
 | W-016 | func (all 9 functional views) | Unconstrained startpoint | u_core/u_crg/u_pll_core, u_pll_npu, u_pll_cpu, u_pll_ddr /LOCK (4 pins) | n/a | PLL lock indicators are asynchronous outputs, synchronized by 2-FF synchronizers in u_core/u_crg/u_lock_sync before use. | KST_func.sdc r4.2 (explicit pin list); PLL-N5-FRAC integration note sec. 3.2 | Jonah Pike / 2026-07-06 | Mei-Lin Chou, Daniel Achterberg | 2026-07-09 | Approved |
-| W-017 | func_ff_0p825v_m40c_cbest_ccbest | Hold | u_sec_encl/u_keyldr/root_key_q_reg_37_ | -0.021 (rev A) | n/a - violation fixed in design (see status) | ECO-B-003 | Jonah Pike / 2026-08-06 | Withdrawal: Mei-Lin Chou, Ines Carvalho | 2026-08-29 | Withdrawn - fixed by ECO-B-003 (hold +0.015 ns) |
+| W-017 | func_ff_0p825v_m40c_cbest_ccbest | Hold | u_sec_encl/u_keyldr/root_key_q_reg_37_ | -0.021 (rev A) | n/a - violation fixed in design (see status) | ECO-B-003; ECO-C-002 | Jonah Pike / 2026-08-06 | Withdrawal: Mei-Lin Chou, Ines Carvalho | 2026-08-29; re-confirmed 2026-09-12 after ECO-C-002 | Withdrawn - fixed by ECO-B-003 (hold +0.015 ns); fix superseded by ECO-C-002 (hold +0.013 ns) |
 | W-018 | mbist_ss_0p675v_125c_cworst_ccworst | Multicycle (setup 2 / hold 1) | u_cpu/u_mbist_ctl/cfg_q_reg_* -> u_cpu/u_l2/u_data_ram*/TEST_* (512) | -0.029 (1-cycle); +0.804 with exception | CPU L2 MBIST configuration registers are static during each march element (as W-007); 2-cycle multicycle. | KST-DFT-EXC rev 3 entry TE-DFT-011; KST_mbist.sdc r2.4 (explicit from-list) | Ayesha Qureshi / 2026-07-16 | Mei-Lin Chou, Samir Haddad | 2026-07-20 | Approved |
 | W-019 | mbist_ss_0p675v_125c_cworst_ccworst | Multicycle (setup 2 / hold 1) | u_ddr_ss/u_mbist_ctl/cfg_q_reg_* -> u_ddr_ss/u_mc0..u_mc3/u_*_ram*/TEST_* (256) | -0.022 (1-cycle); +1.150 with exception | LPDDR5X controller-buffer MBIST configuration registers are static during each march element (as W-007); 2-cycle multicycle. | KST-DFT-EXC rev 3 entry TE-DFT-011; KST_mbist.sdc r2.4 (explicit from-list) | Ayesha Qureshi / 2026-07-16 | Mei-Lin Chou, Samir Haddad | 2026-07-20 | Approved |
 | W-020 | func (all 9 functional views) | Unconstrained startpoint | UART0_RXD, PWR_GOOD[3:0], 13 GPIO_A/GPIO_C interrupt inputs (18 ports) | n/a | Asynchronous input ports, each synchronized by a 2-FF synchronizer in u_periph/u_gpio or u_core/u_crg before use; no synchronous capture. | KST_func.sdc r4.2 (explicit port list) | Jonah Pike / 2026-07-06 | Mei-Lin Chou, Daniel Achterberg | 2026-07-09 | Approved |
@@ -77,7 +79,7 @@ Entries are raised and approved under ALD-QA-CHK-007 rev 7.2 (CHK-STA-04, CHK-ST
 | Status | Count | IDs |
 |---|---|---|
 | Approved | 23 | W-001..W-016, W-018..W-024 |
-| Withdrawn | 1 | W-017 (Withdrawn - ECO-B-003) |
+| Withdrawn | 1 | W-017 (Withdrawn - ECO-B-003, superseded by ECO-C-002) |
 
 ### 4.2 By category
 
@@ -89,7 +91,7 @@ Entries are raised and approved under ALD-QA-CHK-007 rev 7.2 (CHK-STA-04, CHK-ST
 | Test-mode multicycle exceptions (MBIST, OCC) | W-007, W-008, W-018, W-019, W-021 | 5 |
 | Test-mode clock-gating checks on OCC/MBIST enables | W-005, W-006, W-014 | 3 |
 | Test-mode minimum pulse width on PHY macro test pins | W-003, W-013 | 2 |
-| Functional hold (Withdrawn) | W-017 (Withdrawn - ECO-B-003) | 1 |
+| Functional hold (Withdrawn) | W-017 (Withdrawn - ECO-B-003, superseded by ECO-C-002) | 1 |
 
 ## 5. References
 

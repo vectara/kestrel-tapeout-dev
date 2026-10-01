@@ -4,14 +4,14 @@
 |---|---|
 | Doc ID | KST-ARCH-001 |
 | Title | ALX-5100 (KESTREL) Architecture Specification |
-| Revision | B (supersedes A) |
-| Date | 2026-08-31 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-21 |
 | Owner | Priya Raghavan (Chief Architect) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
-Applicable tape-out package: **B** (TRR-2, 2026-09-04). Reference netlist: `kst_top_nl_2026.08.31` (RTL freeze tag `kst_rtl_2026.07.15`; ECOs per KST-ECO-062).
+Applicable tape-out package: **C** (TRR-3, 2026-09-25). Reference netlist: `kst_top_nl_2026.09.19` (RTL freeze tag `kst_rtl_2026.07.15`; ECOs per KST-ECO-062).
 
 ## Revision history
 
@@ -19,6 +19,7 @@ Applicable tape-out package: **B** (TRR-2, 2026-09-04). Reference netlist: `kst_
 |---|---|---|---|
 | A | 2026-08-10 | Priya Raghavan | Initial controlled release for TRR-1. Supersedes working draft 0.9 (2026-07-24). |
 | B | 2026-08-31 | Priya Raghavan | Added PMU wake synchronization note (ECO-B-005); editorial. |
+| C | 2026-09-21 | Priya Raghavan | No technical change; editorial updates for TRR-3. |
 
 ## 1. Scope and references
 
@@ -529,12 +530,12 @@ PCIE0 link training is started by hardware 10 ms after PCIE0_PERST_N de-assertio
 
 | Role | Name | Decision | Date |
 |---|---|---|---|
-| Chief Architect (author) | Priya Raghavan | Approved | 2026-08-31 |
-| Program Manager | Marcus Oyelaran | Approved | 2026-08-31 |
+| Chief Architect (author) | Priya Raghavan | Approved | 2026-09-21 |
+| Program Manager | Marcus Oyelaran | Approved | 2026-09-21 |
 | PCIe Subsystem Owner | Leo Brandt | Reviewed, no comments open | 2026-08-07 |
 | Memory Subsystem Owner (LPDDR5X) | Anjali Deshmukh | Reviewed, no comments open | 2026-08-07 |
 | Security Enclave Owner | Ines Carvalho | Reviewed, no comments open | 2026-08-07 |
 | PMU / Always-on Domain Owner | Kofi Mensah | Reviewed (section 9.1 change), no comments open | 2026-08-28 |
 | NPU Cluster Owner | Viktor Halloran | Reviewed, no comments open | 2026-08-06 |
 | Package & I/O Lead | Rachel Lindqvist | Reviewed, no comments open | 2026-08-07 |
-| Quality & Tape-out Gatekeeper | Oren Feldman | Document-control check complete | 2026-08-31 |
+| Quality & Tape-out Gatekeeper | Oren Feldman | Document-control check complete | 2026-09-21 |

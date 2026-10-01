@@ -4,10 +4,10 @@
 |---|---|
 | Doc ID | KST-VPLAN-010 |
 | Title | Verification Plan |
-| Revision | B (supersedes A) |
-| Date | 2026-09-01 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-22 |
 | Owner | Tomasz Wierzbicki (Verification Lead) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
@@ -23,11 +23,11 @@ Results against this plan are reported in KST-COV-011 (Functional & Code Coverag
 
 | Doc ID | Title | Revision |
 |---|---|---|
-| KST-ARCH-001 | ALX-5100 (KESTREL) Architecture Specification | B |
-| KST-PKG-002 | Package, Pinout & I/O Specification | B |
-| KST-IPBOM-050 | IP Bill of Materials | B |
-| KST-COV-011 | Functional & Code Coverage Report | B |
-| KST-ECO-062 | ECO & Change Log | B |
+| KST-ARCH-001 | ALX-5100 (KESTREL) Architecture Specification | C |
+| KST-PKG-002 | Package, Pinout & I/O Specification | C |
+| KST-IPBOM-050 | IP Bill of Materials | C |
+| KST-COV-011 | Functional & Code Coverage Report | C |
+| KST-ECO-062 | ECO & Change Log | C |
 | ALD-QA-CHK-007 | Tape-out Readiness Checklist | 7.2 |
 | ALX4100-ERR | ALX-4100 (MERLIN) Silicon Errata | 3.1 |
 | ALD-QA-PM-SUMMARY | Silicon Respin Post-mortems | 4 |
@@ -62,6 +62,7 @@ All UVM environments follow the Aldercrest layered template: sequencers and driv
 | NoC credit counters | u_noc | Credit conservation, no overflow/underflow per VC | NoC team |
 | CPU L2 ECC decode | u_cpu/u_l2/u_ecc_dec | Every 1-bit syndrome corrected, every 2-bit syndrome flagged | CPU subsystem team |
 | NPU DMA ring pointers | u_npu_cN/u_dma | Wrap at ring end and 4 KiB page boundary, no descriptor skip or duplicate | Viktor Halloran |
+| L1.2 exit gating (TB-C-001) | u_pcie0_wrap/u_l1ss_ctl | a_l1ss_p12_exit_refclk_valid: PHY P1.2 exit requested only when refclk_valid && tpoweron_done | Leo Brandt |
 | PCIE1 isolation | u_pcie1_wrap/u_pd_ctl | FUSE_PCIE1_DIS=1 implies PD_PCIE1 off, pcie1_core_clk gated, all outputs clamped to reset-safe values | Leo Brandt |
 | Clock-gating equivalence | All partitions | Sequential equivalence of ICG-inserted vs. ungated RTL | SoC integration |
 
@@ -71,7 +72,7 @@ The emulation platform runs the full kst_top with boot ROM, BL1 and runtime firm
 
 ### 3.5 Gate-level simulation
 
-SDF-annotated GLS runs on the sign-off netlist (kst_top_nl_2026.08.31 for this package) with SDF written by the sign-off STA tool at two corners: min = ff_0p825v_m40c_cbest_ccbest and max = ss_0p675v_m40c_cworst_ccworst (at 0.675 V the -40 C corner is the setup-worst corner because of temperature inversion). Timing checks are enabled on all sequential cells and X-propagation is monitored. The GLS list covers boot, reset and low-power entry/exit (CHK-VER-06) and is re-run on every sign-off netlist release, including after each ECO (CHK-GOV-02). SDF back-annotates cell and interconnect delays only: clock uncertainty, SI and POCV are not modelled and the OTP and flash models load fixed test images, so setup and hold closure is owned by STA (CHK-STA-01..03). Scan and MBIST pattern simulation is owned by DFT and is not part of this plan.
+SDF-annotated GLS runs on the sign-off netlist (kst_top_nl_2026.09.19 for this package) with SDF written by the sign-off STA tool at two corners: min = ff_0p825v_m40c_cbest_ccbest and max = ss_0p675v_m40c_cworst_ccworst (at 0.675 V the -40 C corner is the setup-worst corner because of temperature inversion). Timing checks are enabled on all sequential cells and X-propagation is monitored. The GLS list covers boot, reset and low-power entry/exit (CHK-VER-06) and is re-run on every sign-off netlist release, including after each ECO (CHK-GOV-02). SDF back-annotates cell and interconnect delays only: clock uncertainty, SI and POCV are not modelled and the OTP and flash models load fixed test images, so setup and hold closure is owned by STA (CHK-STA-01..03). Scan and MBIST pattern simulation is owned by DFT and is not part of this plan.
 
 ### 3.6 Regression, bug tracking and coverage merge
 
@@ -109,7 +110,7 @@ A covergroup is classified **Escape-history** when the feature it covers escaped
 | Erratum (carry-forward) | Feature | KESTREL fix | Treatment in this plan |
 |---|---|---|---|
 | ALX4100-E01 | NPU DMA descriptor prefetch at 4 KiB ring wrap | NPU-DMA v1.4 (in-house) | Escape-history: cg_npu_dma_ring_wrap |
-| ALX4100-E03 | PCIe L1.2 exit with CLKREQ# re-assert during T_POWER_ON | l1ss_ctl v3.0 (in-house redesign) | Escape-history: cg_pcie0_l12_entry_exit. PCIE1 L1SS logic is unreachable in ALX-5100/ALX-5100I (fused off, CE-004); cg_pcie1_l1ss is to be classified Escape-history for any ALX-5100X release |
+| ALX4100-E03 | PCIe L1.2 exit with CLKREQ# re-assert during T_POWER_ON | l1ss_ctl v3.0.1 (in-house redesign + ECO-C-003) | Escape-history: cg_pcie0_l12_entry_exit. PCIE1 L1SS logic is unreachable in ALX-5100/ALX-5100I (fused off, CE-004); cg_pcie1_l1ss is to be classified Escape-history for any ALX-5100X release |
 | ALX4100-E04 | LPDDR5X RFM activation counter | MC-LP5X vendor fix (version per KST-IPBOM-050) | IP version, CHK-IP-03; integration coverage in cg_mem_refresh_rfm (Tier-1) |
 | ALX4100-E05 | I2C/SMBus clock-stretch timeout | I2C-CTL v1.5 plus in-house SMBus timeout wrapper | Escape-history: cg_i2c_clk_stretch |
 | ALX4100-E07 | LPDDR5X RDQS gate training at cold | MC-LP5X / PHY-LP5X-N5 vendor fix (version per KST-IPBOM-050) | IP version, CHK-IP-03; temperature-dependent PHY behaviour is outside RTL simulation |
@@ -214,7 +215,7 @@ Totals: 61 covergroups; Tier-1 37 (of which Escape-history 4), Tier-2 15, Tier-3
 
 ## 7. cg_pcie0_l12_entry_exit coverage model
 
-L1.2 is implemented by the in-house sequencer u_pcie0_wrap/u_l1ss_ctl (l1ss_ctl v3.0, redesigned after ALX4100-E03). It owns PCIE0_CLKREQ_N, the PHY PowerDown request to P1.2 and back, REFCLK-valid detection and the T_POWER_ON and Common_Mode_Restore_Time (T_COMMONMODE) timers, running on pcie_aux_clk (25 MHz) while REFCLK is off. The L1SS monitor samples the covergroup once per L1.2 residency, at L0 re-entry.
+L1.2 is implemented by the in-house sequencer u_pcie0_wrap/u_l1ss_ctl (l1ss_ctl v3.0.1: v3.0 redesigned after ALX4100-E03, plus ECO-C-003). It owns PCIE0_CLKREQ_N, the PHY PowerDown request to P1.2 and back, REFCLK-valid detection and the T_POWER_ON and Common_Mode_Restore_Time (T_COMMONMODE) timers, running on pcie_aux_clk (25 MHz) while REFCLK is off. The L1SS monitor samples the covergroup once per L1.2 residency, at L0 re-entry.
 
 | Coverpoint / cross | Kind | Bins counted | Bins |
 |---|---|---|---|
@@ -298,7 +299,25 @@ TB-B-001 (testbench change, merged 2026-08-17 .. 2026-08-21; KST-ECO-062) adds 1
 | 13 | l12_tpoweron_130us_gen4 | Host-initiated exit with T_POWER_ON 130 us | Gen4 | tpoweron_130us__gen4 |
 | 14 | l12_entry_abort_clkreq | L1.2 entry aborted by CLKREQ# assertion before REFCLK stop | Gen1-Gen5 | Checker scenario (no new bins) |
 
-Constrained-random library l1ss_cr_lib: randomizes entry trigger, exit trigger (including CLKREQ# re-assert inside T_POWER_ON), T_POWER_ON, LTR value and back-to-back spacing; Gen1-Gen4; 400 seeds per nightly. The library weights PERST# assertion and back-to-back re-entry below 10 us low (both end or reset the L1.2 residency), so their per-rate bins are closed by directed sequences 9 and 10. Sequences 9 and 10 run at Gen3 and Gen2 in this package and their higher-rate variants are planned. The Gen5 variant of the CLKREQ# re-assert sequences (1-4) is planned with the PIPE PHY BFM Gen5 P1.2 exit-latency update (refclk_valid timing after PLL relock); Gen5 variants of sequences 6 and 7 are planned.
+Constrained-random library l1ss_cr_lib: randomizes entry trigger, exit trigger (including CLKREQ# re-assert inside T_POWER_ON), T_POWER_ON, LTR value and back-to-back spacing; Gen1-Gen4; 400 seeds per nightly. The library weights PERST# assertion and back-to-back re-entry below 10 us low (both end or reset the L1.2 residency), so their per-rate bins are closed by directed sequences 9 and 10. At package B, sequences 9 and 10 ran at Gen3 and Gen2 only. The Gen5 variants of sequences 1-4, 6 and 7 and the Gen4/Gen5 variants of sequences 9 and 10 were delivered in TB-C-001 (section 9.3); the remaining Gen1 PERST# and Gen3 back-to-back bins are non-blocking (KST-COV-011 section 7.1).
+
+### 9.3 TB-C-001: L1.2 closure completion (package C)
+
+TB-C-001 (testbench change, merged 2026-09-09 .. 2026-09-16; KST-ECO-062) completes L1.2 closure. Owner: Leo Brandt; review: Tomasz Wierzbicki.
+
+| # | Item | Scenario | Rates | Target bins |
+|---|---|---|---|---|
+| 1 | PIPE PHY BFM update | P1.2 exit: refclk_valid asserted after PHY PLL relock with programmable latency (nominal and worst case); previously a fixed nominal latency | Gen4-Gen5 | Enables 2-6 |
+| 2 | l12_clkreq_tpoweron_gen5 | CLKREQ# re-asserted inside the T_POWER_ON window, offset swept 0-10 us before expiry in 250 ns steps, T_POWER_ON 10/40/70/130 us | Gen5 | clkreq_reassert_during_tpoweron__gen5 |
+| 3 | l12_ltr_update_exit_gen5 | Exit to send LTR below threshold | Gen5 | ltr_update__gen5 |
+| 4 | l12_ep_wake_exit_gen5 | Endpoint wake exit | Gen5 | ep_wake__gen5 |
+| 5 | l12_perst_in_l12_hi_rate | PERST# asserted in L1.2 | Gen4-Gen5 | perst_assert__gen4, perst_assert__gen5 |
+| 6 | l12_b2b_entry_hi_rate | Back-to-back entry less than 10 us after exit | Gen4-Gen5 | b2b_entry_lt_10us__gen4, b2b_entry_lt_10us__gen5 |
+| 7 | l12_tpoweron_130us_ltr_update | LTR-update exit with T_POWER_ON 130 us | Gen1-Gen5 | tpoweron_130us_x_ltr_update |
+| 8 | l1ss_cr_lib extension | Library extended to Gen5; 600 seeds per nightly | Gen1-Gen5 | All |
+| 9 | SVA a_l1ss_p12_exit_refclk_valid | P1.2 exit requested only when refclk_valid && tpoweron_done; simulation plus formal full proof on u_l1ss_ctl | All | PCIE-1187 regression check |
+
+l12_clkreq_tpoweron_gen5 found PCIE-1187 on 2026-09-10 (KST-COV-011 section 4.3). After ECO-C-003 it runs in the nightly smoke set.
 
 ## 10. TRR sign-off criteria
 
@@ -317,13 +336,13 @@ Constrained-random library l1ss_cr_lib: randomizes entry trigger, exit trigger (
 
 | Role | Name | Date |
 |---|---|---|
-| Verification Lead (owner) | Tomasz Wierzbicki | 2026-09-01 |
-| Chief Architect | Priya Raghavan | 2026-09-01 |
-| PCIe Subsystem Owner | Leo Brandt | 2026-09-01 |
-| Memory Subsystem Owner | Anjali Deshmukh | 2026-09-01 |
-| Security Enclave Owner | Ines Carvalho | 2026-09-01 |
-| PMU / Always-on Domain Owner | Kofi Mensah | 2026-09-01 |
-| NPU Cluster Owner | Viktor Halloran | 2026-09-01 |
+| Verification Lead (owner) | Tomasz Wierzbicki | 2026-09-22 |
+| Chief Architect | Priya Raghavan | 2026-09-22 |
+| PCIe Subsystem Owner | Leo Brandt | 2026-09-22 |
+| Memory Subsystem Owner | Anjali Deshmukh | 2026-09-22 |
+| Security Enclave Owner | Ines Carvalho | 2026-09-22 |
+| PMU / Always-on Domain Owner | Kofi Mensah | 2026-09-22 |
+| NPU Cluster Owner | Viktor Halloran | 2026-09-22 |
 
 ## Revision history
 
@@ -331,3 +350,4 @@ Constrained-random library l1ss_cr_lib: randomizes entry trigger, exit trigger (
 |---|---|---|---|
 | A | 2026-08-10 | Tomasz Wierzbicki | Released for TRR-1 (netlist kst_top_nl_2026.08.07) |
 | B | 2026-09-01 | Tomasz Wierzbicki | TB-B-001 L1.2 tests added (section 9.2: 14 directed sequences and constrained-random L1SS library); results in KST-COV-011 rev B; GLS netlist kst_top_nl_2026.08.31; section 3.6: nightly /64 PMU wake regression added (ECO-B-005) |
+| C | 2026-09-22 | Tomasz Wierzbicki | TB-C-001 added (section 9.3, formal target a_l1ss_p12_exit_refclk_valid); u_l1ss_ctl updated to l1ss_ctl v3.0.1 (ECO-C-003); results in KST-COV-011 rev C; GLS netlist kst_top_nl_2026.09.19 |

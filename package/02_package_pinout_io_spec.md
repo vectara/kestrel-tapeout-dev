@@ -4,14 +4,14 @@
 |---|---|
 | Doc ID | KST-PKG-002 |
 | Title | Package, Pinout & I/O Specification |
-| Revision | B (supersedes A) |
-| Date | 2026-09-01 |
+| Revision | C (supersedes B) |
+| Date | 2026-09-21 |
 | Owner | Rachel Lindqvist (Package & I/O Lead) |
-| Status | Released for TRR-2 |
+| Status | Released for TRR-3 |
 | Project | KESTREL (ALX-5100), PRJ-2025-017 |
 | Classification | Aldercrest Confidential - synthetic demo data |
 
-Applicable tape-out package: **B** (TRR-2, 2026-09-04). Netlist `kst_top_nl_2026.08.31`; pad-ring database release PR-15 (CHG-B-001, CHG-B-002); substrate design SUB-R07 (unchanged); ball-map source file `kst_ballmap_revB.csv`.
+Applicable tape-out package: **C** (TRR-3, 2026-09-25). Netlist `kst_top_nl_2026.09.19`; pad-ring database release PR-15 (unchanged since B); substrate design SUB-R07; ball-map source file `kst_ballmap_revC.csv`.
 
 ## Revision history
 
@@ -20,6 +20,7 @@ Applicable tape-out package: **B** (TRR-2, 2026-09-04). Netlist `kst_top_nl_2026
 | A | 2026-08-11 | Rachel Lindqvist | Initial controlled release for TRR-1. Supersedes working draft 0.8 (2026-07-22). |
 | B | 2026-09-01 | Rachel Lindqvist | CHG-B-001: NC balls AR44, AT44, AU44, AV44, AW44, AY44 re-labelled TP_0..TP_5 (documentation only). |
 | B | 2026-09-01 | Rachel Lindqvist | CHG-B-002: GPIO_B I/O cells changed from IO_GPIO_1V2 to IO_GPIO_1V8 and VDDIO_B from 1.2 V to 1.8 V to match KST-ARCH-001 (1.8 V QSPI0 boot flash and SPI1 sensor); 16 pad-ring cells swapped; ball map unchanged. |
+| C | 2026-09-21 | Rachel Lindqvist | No design change since B; section 9 checks re-run against netlist kst_top_nl_2026.09.19; re-issued for TRR-3. |
 
 ## 1. Scope and references
 
@@ -412,11 +413,11 @@ Total LPDDR5X signal balls: 32 x 13 + 4 x 46 = 600.
 
 | Check | Result | Date | By |
 |---|---|---|---|
-| Ball map vs. KST-ARCH-001 interface signal list (CHK-SPEC-02) | PASS: 761/761 signal balls assigned; 0 unassigned interface signals; 6 reserved test pads TP_0..TP_5 (section 7.12) excluded | 2026-09-01 | Rachel Lindqvist |
-| Ball map vs. top-level ports of kst_top_nl_2026.08.31 | PASS: 761 ports matched | 2026-08-31 | Rachel Lindqvist |
-| I/O cell max VDDIO >= bank VDDIO (section 3.1 vs section 4) | PASS (4/4 banks) | 2026-08-31 | Rachel Lindqvist |
-| Pad-ring LVS / ERC, GPIO segment incl. ring breakers | PASS, 0 errors | 2026-08-29 | Daniel Achterberg |
-| ESD network check (HBM 1 kV, CDM 250 V), per GPIO bank and all PHY hard-macro pads | PASS (incl. PHY-LP5X-N5 v2.7.0 macro pads after ECO-B-004) | 2026-08-29 | Rachel Lindqvist |
+| Ball map vs. KST-ARCH-001 interface signal list (CHK-SPEC-02) | PASS: 761/761 signal balls assigned; 0 unassigned interface signals; 6 reserved test pads TP_0..TP_5 (section 7.12) excluded | 2026-09-21 | Rachel Lindqvist |
+| Ball map vs. top-level ports of kst_top_nl_2026.09.19 | PASS: 761 ports matched | 2026-09-20 | Rachel Lindqvist |
+| I/O cell max VDDIO >= bank VDDIO (section 3.1 vs section 4) | PASS (4/4 banks) | 2026-09-21 | Rachel Lindqvist |
+| Pad-ring LVS / ERC, GPIO segment incl. ring breakers | PASS, 0 errors | 2026-09-20 | Daniel Achterberg |
+| ESD network check (HBM 1 kV, CDM 250 V), per GPIO bank and all PHY hard-macro pads | PASS (pad ring PR-15 unchanged since B; per-bank ESD network re-verified; chip-level ESD/latch-up on the final GDS is recorded in KST-TRK-061 section 6) | 2026-09-21 | Rachel Lindqvist |
 | Bump-to-ball netlist (package / die co-design) | PASS, 0 opens, 0 shorts | 2026-08-29 | Rachel Lindqvist |
 | Substrate DRC (SUB-R07) | PASS | 2026-08-06 | Rachel Lindqvist |
 | Power-ball current capacity (0.35 A per ball at 105 C) | PASS, worst VDD_NPU 0.21 A per ball | 2026-08-10 | Grace Adeyemi |
@@ -424,13 +425,15 @@ Total LPDDR5X signal balls: 32 x 13 + 4 x 46 = 600.
 | PCIE0 package channel, lanes 0..15 | PASS, worst insertion loss 2.9 dB at 16 GHz | 2026-08-07 | Leo Brandt |
 | LPDDR5X package SI, byte-lane skew | PASS, worst 4.1 ps (budget 5 ps) | 2026-08-07 | Anjali Deshmukh |
 
+Package-level checks dated 2026-08-06 .. 2026-08-31 are carried from package B: ECO-C-001..003 are core-only changes (pad ring PR-15 and substrate SUB-R07 unchanged).
+
 ## 10. Review and approval
 
 | Role | Name | Decision | Date |
 |---|---|---|---|
-| Package & I/O Lead (author) | Rachel Lindqvist | Approved | 2026-09-01 |
-| Chief Architect | Priya Raghavan | Approved | 2026-09-01 |
-| Physical Design Lead | Daniel Achterberg | Approved | 2026-09-01 |
+| Package & I/O Lead (author) | Rachel Lindqvist | Approved | 2026-09-21 |
+| Chief Architect | Priya Raghavan | Approved | 2026-09-21 |
+| Physical Design Lead | Daniel Achterberg | Approved | 2026-09-21 |
 | Power Integrity Lead | Grace Adeyemi | Reviewed (power-ball allocation) | 2026-08-10 |
 | PCIe Subsystem Owner | Leo Brandt | Reviewed (PCIE0/PCIE1 ball-out) | 2026-08-09 |
 | Memory Subsystem Owner (LPDDR5X) | Anjali Deshmukh | Reviewed (LPDDR5X ball-out) | 2026-08-09 |
