@@ -71,8 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the trusted runner (default branch, never the PR's code)
+        uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.repository.default_branch }}
           sparse-checkout: .github/tapeout
       - name: Ask the reviewer in the PR's own gate session
         env:
@@ -97,8 +99,10 @@ jobs:
       name: fab
       url: ${{ github.event.pull_request.html_url }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the trusted runner (default branch, never the PR's code)
+        uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.repository.default_branch }}
           sparse-checkout: .github/tapeout
       - name: Tape-out recorded; retro agent proposes rulebook amendments
         env:
