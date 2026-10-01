@@ -79,6 +79,7 @@ jobs:
       - name: Ask the reviewer in the PR's own gate session
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
           VECTARA_API_KEY: ${{ secrets.VECTARA_API_KEY }}
           VECTARA_BASE_URL: ${{ secrets.VECTARA_BASE_URL }}
         run: >-
